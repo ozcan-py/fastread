@@ -1,104 +1,234 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hızlı Okuyucu — Markdown</title>
+<title>Pace — Speed Reader</title>
 <style>
   :root{
-    --paper:#FAF9F6; --ink:#22242A; --muted:#BBBFC7;
-    --marker:#FFE15D; --marker-soft:#FFF0A6;
-    --accent:#0F766E; --accent-dark:#0B5A54;
-    --line:#E7E4DC; --rule:#111318;
+    --bg:#FBFBFA;
+    --surface:#FFFFFF;
+    --ink:#0B0C0E;
+    --ink-2:#585B63;
+    --ink-3:#9B9EA6;
+    --muted:#C6C9CF;
+    --line:#E8E8E4;
+    --line-2:#D9D9D3;
+    --accent:#4F46E5;
+    --accent-2:#4338CA;
+    --accent-soft:#EEEDFC;
+    --marker:#FFE14D;
+    --marker-soft:#FFF3A3;
+
+    /* reader typography (driven by settings) */
+    --doc-font:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --doc-size:18.5px;
+    --doc-width:760px;
+    --doc-word:0px;
+    --doc-line:1.72;
   }
   *{box-sizing:border-box}
   html{scroll-behavior:smooth}
-  body{margin:0;background:var(--paper);color:var(--ink);
+  body{
+    margin:0;background:var(--bg);color:var(--ink);
     font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    -webkit-font-smoothing:antialiased;}
+    -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+  }
+  button{font-family:inherit}
 
-  /* ---------- landing (paste screen) ---------- */
-  .landing{max-width:720px;margin:0 auto;padding:56px 26px}
-  .brand{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--accent);font-weight:800;margin-bottom:14px}
-  .landing h1{font-family:Georgia,serif;font-weight:700;font-size:clamp(30px,6vw,46px);line-height:1.08;margin:0 0 12px;letter-spacing:-.015em}
-  .landing p.lead{font-size:18px;line-height:1.6;color:#5c5f66;margin:0 0 26px;max-width:52ch}
-  textarea{width:100%;min-height:240px;resize:vertical;padding:18px;border:1px solid var(--line);
-    border-radius:14px;background:#fff;font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
-    font-size:14px;line-height:1.6;color:var(--ink);outline:none;transition:border-color .15s ease,box-shadow .15s ease}
-  textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(15,118,110,.12)}
-  .actions{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:16px}
-  .primary{appearance:none;border:none;cursor:pointer;background:var(--accent);color:#fff;
-    font-size:15px;font-weight:700;padding:13px 26px;border-radius:11px;transition:background .15s ease,transform .05s ease}
-  .primary:hover{background:var(--accent-dark)} .primary:active{transform:scale(.97)}
-  .ghost{appearance:none;cursor:pointer;background:#fff;color:var(--ink);border:1px solid var(--line);
-    font-size:14px;font-weight:600;padding:13px 18px;border-radius:11px;transition:border-color .15s ease,background .15s ease}
-  .ghost:hover{border-color:#c9c5ba;background:#fdfdfb}
-  .file{display:none}
+  /* ============ top bar ============ */
+  .bar{
+    position:sticky;top:0;z-index:60;display:none;
+    background:rgba(251,251,250,.88);backdrop-filter:blur(12px) saturate(1.4);
+    border-bottom:1px solid var(--line);
+  }
+  body.reading .bar{display:block}
+  .progress{height:2px;background:var(--line)}
+  .progress i{display:block;height:100%;width:0;background:var(--accent);transition:width .12s linear}
+  .controls{
+    max-width:860px;margin:0 auto;padding:10px 20px;
+    display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  }
+  .play{
+    appearance:none;border:none;cursor:pointer;width:42px;height:42px;border-radius:12px;
+    background:var(--ink);color:#fff;display:grid;place-items:center;flex:0 0 auto;
+    transition:background .15s ease,transform .06s ease;
+  }
+  .play:hover{background:#26282e}
+  .play:active{transform:scale(.95)}
+  .play svg{width:18px;height:18px;fill:#fff}
+  .icon-btn{
+    appearance:none;cursor:pointer;background:var(--surface);border:1px solid var(--line-2);
+    color:var(--ink-2);width:42px;height:42px;border-radius:12px;display:grid;place-items:center;
+    transition:border-color .15s ease,color .15s ease,background .15s ease;flex:0 0 auto;
+  }
+  .icon-btn:hover{border-color:#bfc2c8;color:var(--ink)}
+  .icon-btn.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .icon-btn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .text-btn{
+    appearance:none;cursor:pointer;background:transparent;border:none;color:var(--ink-3);
+    font-size:13px;font-weight:600;padding:8px 10px;border-radius:9px;
+    transition:color .15s ease,background .15s ease;
+  }
+  .text-btn:hover{color:var(--ink);background:#f1f1ee}
+
+  .wpm-group{display:flex;align-items:center;gap:10px;margin-left:auto}
+  .wpm-group .lbl{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);font-weight:700}
+  .wpm-read{font-variant-numeric:tabular-nums;font-weight:700;font-size:14px;min-width:76px;text-align:right}
+  .wpm-read b{font-size:18px;letter-spacing:-.01em}
+  .wpm-read span{color:var(--ink-3);font-weight:600;font-size:11.5px;margin-left:3px}
+
+  /* ============ sliders (shared) ============ */
+  input[type=range]{
+    -webkit-appearance:none;appearance:none;height:26px;background:transparent;cursor:pointer;margin:0;
+  }
+  input[type=range]:focus{outline:none}
+  input[type=range]::-webkit-slider-runnable-track{
+    height:4px;border-radius:99px;
+    background:linear-gradient(to right,var(--accent) 0%,var(--accent) var(--fill,50%),var(--line-2) var(--fill,50%),var(--line-2) 100%);
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;appearance:none;width:16px;height:16px;border-radius:50%;
+    background:#fff;border:2px solid var(--accent);margin-top:-6px;
+    box-shadow:0 1px 4px rgba(11,12,14,.18);transition:transform .1s ease;
+  }
+  input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
+  input[type=range]::-moz-range-track{height:4px;border-radius:99px;background:var(--line-2)}
+  input[type=range]::-moz-range-progress{height:4px;border-radius:99px;background:var(--accent)}
+  input[type=range]::-moz-range-thumb{
+    width:12px;height:12px;border-radius:50%;background:#fff;border:2px solid var(--accent);
+    box-shadow:0 1px 4px rgba(11,12,14,.18);
+  }
+  .wpm-group input[type=range]{width:130px}
+
+  /* ============ settings panel ============ */
+  .panel{
+    max-width:860px;margin:0 auto;overflow:hidden;
+    max-height:0;opacity:0;transition:max-height .28s ease,opacity .22s ease;
+  }
+  .panel.open{max-height:420px;opacity:1}
+  .panel-inner{
+    margin:2px 20px 14px;padding:18px 20px;
+    background:var(--surface);border:1px solid var(--line);border-radius:16px;
+    box-shadow:0 8px 28px rgba(11,12,14,.06);
+    display:grid;grid-template-columns:repeat(2,1fr);gap:18px 28px;
+  }
+  .field{display:flex;flex-direction:column;gap:7px}
+  .field .head{display:flex;justify-content:space-between;align-items:baseline}
+  .field .name{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);font-weight:700}
+  .field .val{font-size:12.5px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
+  .seg{display:flex;background:#F1F1EE;border-radius:10px;padding:3px;gap:3px}
+  .seg button{
+    flex:1;appearance:none;border:none;cursor:pointer;background:transparent;
+    padding:7px 0;border-radius:8px;font-size:13px;font-weight:600;color:var(--ink-2);
+    transition:background .15s ease,color .15s ease,box-shadow .15s ease;
+  }
+  .seg button.on{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(11,12,14,.12)}
+  .seg button.f-serif{font-family:Georgia,"Times New Roman",serif}
+  .seg button.f-mono{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:12px}
+
+  .hint{
+    max-width:860px;margin:0 auto;padding:6px 20px 0;display:none;
+    font-size:12px;color:var(--ink-3);
+  }
+  body.reading .hint{display:block}
+  kbd{
+    background:var(--surface);border:1px solid var(--line-2);border-bottom-width:2px;
+    border-radius:5px;padding:1px 6px;font-size:10.5px;font-weight:700;color:var(--ink-2);font-family:inherit;
+  }
+
+  /* ============ landing ============ */
+  .landing{max-width:720px;margin:0 auto;padding:64px 24px 80px}
+  body.reading .landing{display:none}
+  .brand{
+    display:inline-flex;align-items:center;gap:8px;margin-bottom:22px;
+    font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-3);font-weight:800;
+  }
+  .brand::before{content:"";width:26px;height:10px;background:var(--marker);border-radius:2px;transform:skewX(-12deg)}
+  .landing h1{
+    font-weight:800;font-size:clamp(34px,6.4vw,54px);line-height:1.04;
+    letter-spacing:-.035em;margin:0 0 14px;
+  }
+  .landing h1 mark{
+    background:linear-gradient(180deg,transparent 12%,var(--marker) 12%,var(--marker) 92%,transparent 92%);
+    padding:0 4px;border-radius:4px;
+  }
+  .landing p.lead{font-size:16.5px;line-height:1.6;color:var(--ink-2);margin:0 0 30px;max-width:54ch}
+  .dropzone{position:relative}
+  textarea{
+    width:100%;min-height:250px;resize:vertical;padding:18px;border:1px solid var(--line-2);
+    border-radius:16px;background:var(--surface);
+    font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:13.5px;line-height:1.6;
+    color:var(--ink);outline:none;transition:border-color .15s ease,box-shadow .15s ease;
+  }
+  textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+  .dropzone.drag textarea{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);background:var(--accent-soft)}
+  .actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:16px}
+  .primary{
+    appearance:none;border:none;cursor:pointer;background:var(--ink);color:#fff;
+    font-size:14.5px;font-weight:700;padding:13px 28px;border-radius:12px;
+    transition:background .15s ease,transform .06s ease;
+  }
+  .primary:hover{background:#26282e}
+  .primary:active{transform:scale(.97)}
+  .ghost{
+    appearance:none;cursor:pointer;background:var(--surface);color:var(--ink);border:1px solid var(--line-2);
+    font-size:13.5px;font-weight:600;padding:13px 18px;border-radius:12px;
+    transition:border-color .15s ease;
+  }
+  .ghost:hover{border-color:#bfc2c8}
   .sample{margin-left:auto;font-size:13px;color:var(--accent);cursor:pointer;font-weight:600;background:none;border:none}
   .sample:hover{text-decoration:underline}
+  .formats{margin-top:14px;font-size:12px;color:var(--ink-3)}
+  .formats b{color:var(--ink-2);font-weight:700}
+  .file{display:none}
 
-  /* ---------- reader bar ---------- */
-  .bar{position:sticky;top:0;z-index:50;background:rgba(250,249,246,.92);backdrop-filter:blur(8px);
-    border-bottom:1px solid var(--line);display:none}
-  body.reading .bar{display:block}
-  body.reading .landing{display:none}
-  .progress{height:3px;background:transparent}
-  .progress i{display:block;height:100%;width:0;background:var(--rule);transition:width .12s linear}
-  .controls{max-width:760px;margin:0 auto;padding:11px 22px;display:flex;align-items:center;gap:13px;flex-wrap:wrap}
-  .play{appearance:none;border:none;cursor:pointer;width:46px;height:46px;border-radius:50%;
-    background:var(--accent);color:#fff;display:grid;place-items:center;flex:0 0 auto;transition:background .15s ease,transform .05s ease}
-  .play:hover{background:var(--accent-dark)} .play:active{transform:scale(.94)}
-  .play svg{width:20px;height:20px;fill:#fff}
-  .btn{appearance:none;cursor:pointer;border:1px solid var(--line);background:#fff;color:var(--ink);
-    padding:8px 12px;border-radius:9px;font-size:13px;font-weight:600;transition:border-color .15s ease,background .15s ease}
-  .btn:hover{border-color:#c9c5ba;background:#fdfdfb}
-  .speed{display:flex;align-items:center;gap:9px;margin-left:auto}
-  .speed label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#8a8e97;font-weight:700}
-  .speed input[type=range]{width:140px;accent-color:var(--accent)}
-  .wpm{font-variant-numeric:tabular-nums;font-weight:700;min-width:64px;text-align:right;font-size:14px}
-  .wpm b{font-size:19px} .wpm span{color:#9a9ea6;font-weight:600;font-size:12px}
-  .hint{max-width:760px;margin:0 auto;padding:0 26px;font-size:12.5px;color:#9a9ea6;margin-top:6px;display:none}
-  body.reading .hint{display:block}
-  kbd{background:#fff;border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:1px 6px;font-size:11px;font-family:inherit;font-weight:700;color:#5c5f66}
-
-  /* ---------- document ---------- */
-  .doc{max-width:760px;margin:0 auto;padding:40px 26px 40vh;display:none}
+  /* ============ document ============ */
+  .doc{
+    max-width:var(--doc-width);margin:0 auto;padding:44px 26px 42vh;display:none;
+    font-family:var(--doc-font);word-spacing:var(--doc-word);
+  }
   body.reading .doc{display:block}
-  h1.title{font-family:Georgia,serif;font-weight:700;font-size:clamp(28px,5vw,40px);line-height:1.12;letter-spacing:-.01em;margin:0 0 6px}
-  h2.h{font-family:Georgia,serif;font-weight:700;font-size:clamp(20px,3.4vw,26px);line-height:1.2;margin:44px 0 4px;letter-spacing:-.005em}
-  h2.h::before{content:"";display:block;width:34px;height:2px;background:var(--rule);margin-bottom:14px}
-  h3.h{font-family:Georgia,serif;font-weight:700;font-size:19px;margin:30px 0 2px}
-  p.para{font-size:18.5px;line-height:1.72;margin:16px 0}
-  blockquote{margin:18px 0;padding:4px 0 4px 20px;border-left:3px solid var(--accent);color:#3c3f46}
-  blockquote p{font-size:18px;line-height:1.66;margin:6px 0;font-style:italic}
+  h1.title{font-weight:800;font-size:calc(var(--doc-size)*2.1);line-height:1.12;letter-spacing:-.02em;margin:0 0 8px}
+  h2.h{font-weight:750;font-size:calc(var(--doc-size)*1.42);line-height:1.22;margin:46px 0 4px;letter-spacing:-.01em}
+  h2.h::before{content:"";display:block;width:30px;height:3px;background:var(--accent);border-radius:2px;margin-bottom:14px}
+  h3.h{font-weight:700;font-size:calc(var(--doc-size)*1.12);margin:30px 0 2px}
+  p.para{font-size:var(--doc-size);line-height:var(--doc-line);margin:16px 0}
+  blockquote{margin:18px 0;padding:4px 0 4px 20px;border-left:3px solid var(--accent)}
+  blockquote p{font-size:calc(var(--doc-size)*0.97);line-height:var(--doc-line);margin:6px 0;font-style:italic;color:#33353c}
   ul.list,ol.list{margin:14px 0;padding:0;list-style:none;counter-reset:li}
-  li.item{font-size:18.5px;line-height:1.66;margin:9px 0;padding-left:28px;position:relative}
-  ul.list li.item::before{content:"";position:absolute;left:5px;top:.72em;width:7px;height:7px;background:var(--accent);border-radius:2px}
+  li.item{font-size:var(--doc-size);line-height:var(--doc-line);margin:9px 0;padding-left:28px;position:relative}
+  ul.list li.item::before{content:"";position:absolute;left:5px;top:.7em;width:7px;height:7px;background:var(--accent);border-radius:2px}
   ol.list li.item{counter-increment:li}
-  ol.list li.item::before{content:counter(li);position:absolute;left:0;top:.05em;font-weight:800;color:var(--accent);font-size:14px}
-  strong{font-weight:700} em{font-style:italic}
-  code{background:#F0EEE7;padding:1px 6px;border-radius:5px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.88em}
+  ol.list li.item::before{content:counter(li);position:absolute;left:1px;top:.08em;font-weight:800;color:var(--accent);font-size:.75em}
+  strong{font-weight:750} em{font-style:italic}
+  code{background:#F0F0EC;padding:1px 6px;border-radius:5px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.86em}
 
-  .w{color:var(--muted);transition:color .18s ease;cursor:pointer;border-radius:5px;padding:1px 1px;position:relative}
+  .w{color:var(--muted);transition:color .16s ease;cursor:pointer;border-radius:4px;padding:1px 1px}
   .w.read{color:var(--ink)}
-  .w.active{color:#1a1a1a;
+  .w.active{
+    color:#101114;
     background:linear-gradient(180deg,transparent 8%,var(--marker-soft) 8%,var(--marker) 96%,transparent 96%);
-    box-shadow:0 0 0 2px var(--marker);border-radius:4px}
-  .w:hover{color:var(--ink);background:#f0eee7}
+    box-shadow:0 0 0 2px var(--marker);border-radius:4px;
+  }
+  .w:hover{color:var(--ink);background:#efefec}
 
-  .tblwrap{margin:22px 0;border:1px solid var(--line);border-radius:12px;overflow:auto;transition:box-shadow .2s ease,border-color .2s ease}
+  .tblwrap{
+    margin:22px 0;border:1px solid var(--line);border-radius:14px;overflow:auto;
+    background:var(--surface);transition:box-shadow .2s ease,border-color .2s ease;
+  }
   .tblwrap.active{border-color:var(--marker);box-shadow:0 0 0 3px var(--marker-soft)}
-  table{width:100%;border-collapse:collapse;font-size:15px}
+  table{width:100%;border-collapse:collapse;font-size:calc(var(--doc-size)*0.82)}
   th,td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--line)}
-  thead th{background:#F3F1EA;font-weight:700;font-size:12px;letter-spacing:.03em;text-transform:uppercase;color:#5c5f66}
+  thead th{background:#F6F6F3;font-weight:700;font-size:.78em;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-2)}
   tbody tr:last-child td{border-bottom:none}
-  tbody tr:hover td{background:#fbfaf6}
+  tbody tr:hover td{background:#fafaf7}
 
   @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto} *{transition:none!important}}
-  @media (max-width:560px){
-    .speed{margin-left:0;width:100%;justify-content:space-between}
-    .speed input[type=range]{flex:1}
-    p.para,li.item{font-size:17px}
+  @media (max-width:640px){
+    .panel-inner{grid-template-columns:1fr}
+    .wpm-group{width:100%;margin-left:0}
+    .wpm-group input[type=range]{flex:1}
   }
 </style>
 </head>
@@ -108,110 +238,179 @@
 <div class="bar">
   <div class="progress"><i id="prog"></i></div>
   <div class="controls">
-    <button class="play" id="play" aria-label="Oynat / Duraklat">
+    <button class="play" id="play" aria-label="Play / Pause">
       <svg id="playIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
     </button>
-    <button class="btn" id="restart">↺ Baştan</button>
-    <button class="btn" id="newtext">← Yeni metin</button>
-    <div class="speed">
-      <label for="wpm">Hız</label>
-      <input type="range" id="wpm" min="120" max="700" step="20" value="320">
-      <div class="wpm"><b id="wpmVal">320</b> <span>k/dk</span></div>
+    <button class="icon-btn" id="restart" title="Restart" aria-label="Restart">
+      <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>
+    </button>
+    <button class="text-btn" id="newtext">← New text</button>
+    <div class="wpm-group">
+      <span class="lbl">Speed</span>
+      <input type="range" id="wpm" min="120" max="800" step="20" value="320">
+      <div class="wpm-read"><b id="wpmVal">320</b><span>wpm</span></div>
+      <button class="icon-btn" id="settingsBtn" title="Typography settings" aria-label="Typography settings">
+        <svg viewBox="0 0 24 24"><path d="M4 20L9.5 5h1.5L16.5 20"/><path d="M6.5 14h8"/><path d="M19 10v10"/><path d="M16.5 17.5L19 20l2.5-2.5"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- settings panel -->
+  <div class="panel" id="panel">
+    <div class="panel-inner">
+      <div class="field" style="grid-column:1/-1">
+        <div class="head"><span class="name">Font</span></div>
+        <div class="seg" id="fontSeg">
+          <button data-font="sans" class="on">Sans</button>
+          <button data-font="serif" class="f-serif">Serif</button>
+          <button data-font="mono" class="f-mono">Mono</button>
+        </div>
+      </div>
+      <div class="field">
+        <div class="head"><span class="name">Font size</span><span class="val" id="vSize">18.5 px</span></div>
+        <input type="range" id="sSize" min="14" max="28" step="0.5" value="18.5">
+      </div>
+      <div class="field">
+        <div class="head"><span class="name">Page width</span><span class="val" id="vWidth">760 px</span></div>
+        <input type="range" id="sWidth" min="560" max="1200" step="20" value="760">
+      </div>
+      <div class="field">
+        <div class="head"><span class="name">Word spacing</span><span class="val" id="vWord">0 px</span></div>
+        <input type="range" id="sWord" min="0" max="14" step="1" value="0">
+      </div>
+      <div class="field">
+        <div class="head"><span class="name">Line height</span><span class="val" id="vLine">1.72</span></div>
+        <input type="range" id="sLine" min="1.3" max="2.4" step="0.02" value="1.72">
+      </div>
     </div>
   </div>
 </div>
-<p class="hint"><kbd>Boşluk</kbd> oynat/duraklat · <kbd>←</kbd> <kbd>→</kbd> hız · kelimeye tıkla → oradan başla</p>
+<p class="hint"><kbd>Space</kbd> play / pause · <kbd>←</kbd> <kbd>→</kbd> speed · click any word to jump there</p>
 
 <!-- ===== landing ===== -->
 <div class="landing" id="landing">
-  <div class="brand">Hızlı Okuyucu</div>
-  <h1>Markdown yapıştır, fosforlu kalemle oku.</h1>
-  <p class="lead">Claude'da ürettiğin herhangi bir markdown'ı aşağıya yapıştır. Aktif kelime sarı ile vurgulanır, ilerledikçe kayar; hızı istediğin gibi ayarlarsın.</p>
-  <textarea id="input" placeholder="# Başlık&#10;&#10;Buraya markdown metnini yapıştır...&#10;&#10;- Madde bir&#10;- Madde iki&#10;&#10;| Kolon | Değer |&#10;|---|---|&#10;| a | 1 |"></textarea>
-  <div class="actions">
-    <button class="primary" id="read">Oku →</button>
-    <button class="ghost" id="upload">.md dosyası yükle</button>
-    <input type="file" id="fileInput" class="file" accept=".md,.markdown,.txt,text/markdown,text/plain">
-    <button class="sample" id="loadSample">Örnek metni dene</button>
+  <div class="brand">Pace · Speed Reader</div>
+  <h1>Paste anything.<br>Read it <mark>fast</mark>.</h1>
+  <p class="lead">Drop in Markdown, plain text, or an HTML file. The active word is highlighted like a marker pen and the page scrolls with you — tune the speed and typography to taste.</p>
+  <div class="dropzone" id="dropzone">
+    <textarea id="input" placeholder="# Paste your Markdown, text, or HTML here…&#10;&#10;You can also drag & drop a .md / .txt / .html file anywhere on this box."></textarea>
   </div>
+  <div class="actions">
+    <button class="primary" id="read">Start reading →</button>
+    <button class="ghost" id="upload">Open a file</button>
+    <input type="file" id="fileInput" class="file" accept=".md,.markdown,.txt,.html,.htm,text/markdown,text/plain,text/html">
+    <button class="sample" id="loadSample">Try the sample</button>
+  </div>
+  <div class="formats">Supported: <b>.md</b> (headings, lists, tables, quotes, bold/italic/code) · <b>.txt</b> · <b>.html</b> (headings, paragraphs, lists, tables)</div>
 </div>
 
 <div class="doc" id="doc"></div>
 
 <script>
-/* ============ Markdown parser (Claude çıktısı alt kümesi) ============ */
-function parseBlocks(md){
+/* ================= Markdown parser ================= */
+function parseMd(md){
   const lines = md.replace(/\r\n?/g,'\n').split('\n');
-  const blocks = [];
-  let i=0;
+  const blocks = []; let i=0;
   const isTableSep = s => /^\s*\|?[\s:|-]*-[\s:|-]*\|?\s*$/.test(s) && s.includes('-');
   const splitRow = s => s.replace(/^\s*\|/,'').replace(/\|\s*$/,'').split('|').map(c=>c.trim());
-
   while(i<lines.length){
-    let line = lines[i];
+    let line=lines[i];
     if(line.trim()===''){ i++; continue; }
-
-    // table
     if(/^\s*\|.*\|\s*$/.test(line) && i+1<lines.length && isTableSep(lines[i+1])){
-      const head = splitRow(line); i+=2; const rows=[];
+      const head=splitRow(line); i+=2; const rows=[];
       while(i<lines.length && /^\s*\|.*\|\s*$/.test(lines[i])){ rows.push(splitRow(lines[i])); i++; }
-      blocks.push({t:'table', head, rows}); continue;
+      blocks.push({t:'table',head,rows}); continue;
     }
-    // heading
-    let m = line.match(/^(#{1,6})\s+(.*)$/);
+    let m=line.match(/^(#{1,6})\s+(.*)$/);
     if(m){ const lvl=m[1].length; blocks.push({t: lvl===1?'h1':lvl===2?'h2':'h3', x:m[2].trim()}); i++; continue; }
-    // hr
     if(/^\s*([-*_])\1{2,}\s*$/.test(line)){ i++; continue; }
-    // blockquote
     if(/^\s*>\s?/.test(line)){
       const buf=[];
       while(i<lines.length && /^\s*>\s?/.test(lines[i])){ buf.push(lines[i].replace(/^\s*>\s?/,'')); i++; }
-      blocks.push({t:'quote', x:buf.join(' ')}); continue;
+      blocks.push({t:'quote',x:buf.join(' ')}); continue;
     }
-    // unordered list
     if(/^\s*[-*+]\s+/.test(line)){
       const items=[];
       while(i<lines.length && /^\s*[-*+]\s+/.test(lines[i])){ items.push(lines[i].replace(/^\s*[-*+]\s+/,'')); i++; }
-      blocks.push({t:'ul', items}); continue;
+      blocks.push({t:'ul',items}); continue;
     }
-    // ordered list
     if(/^\s*\d+\.\s+/.test(line)){
       const items=[];
       while(i<lines.length && /^\s*\d+\.\s+/.test(lines[i])){ items.push(lines[i].replace(/^\s*\d+\.\s+/,'')); i++; }
-      blocks.push({t:'ol', items}); continue;
+      blocks.push({t:'ol',items}); continue;
     }
-    // paragraph (gather consecutive plain lines)
     const buf=[line]; i++;
     while(i<lines.length && lines[i].trim()!=='' &&
           !/^\s*#{1,6}\s+/.test(lines[i]) && !/^\s*[-*+]\s+/.test(lines[i]) &&
           !/^\s*\d+\.\s+/.test(lines[i]) && !/^\s*>\s?/.test(lines[i]) &&
           !/^\s*\|.*\|\s*$/.test(lines[i])){ buf.push(lines[i]); i++; }
-    blocks.push({t:'p', x:buf.join(' ')});
+    blocks.push({t:'p',x:buf.join(' ')});
   }
   return blocks;
 }
 
-/* inline markdown -> HTML (escaped) */
+/* ================= HTML parser ================= */
+function looksLikeHtml(s){
+  return /^\s*</.test(s) && /<\/?(html|body|div|p|h[1-6]|ul|ol|table|article|section|span|br)\b/i.test(s);
+}
+function parseHtml(html){
+  const d=new DOMParser().parseFromString(html,'text/html');
+  d.querySelectorAll('script,style,noscript,svg,iframe,head,button,input,select,textarea').forEach(e=>e.remove());
+  const blocks=[];
+  const txt=el=>el.textContent.replace(/\s+/g,' ').trim();
+  function pushTable(tbl){
+    let head=[], rows=[];
+    const trs=[...tbl.querySelectorAll('tr')];
+    if(!trs.length) return;
+    const first=trs[0];
+    if(first.querySelector('th')){ head=[...first.children].map(txt); rows=trs.slice(1).map(tr=>[...tr.children].map(txt)); }
+    else { head=[...first.children].map(txt); rows=trs.slice(1).map(tr=>[...tr.children].map(txt)); }
+    if(head.length) blocks.push({t:'table',head,rows});
+  }
+  function walk(node){
+    [...node.children].forEach(el=>{
+      const tag=el.tagName.toLowerCase();
+      if(tag==='h1'){ const x=txt(el); if(x) blocks.push({t:'h1',x}); }
+      else if(tag==='h2'){ const x=txt(el); if(x) blocks.push({t:'h2',x}); }
+      else if(/^h[3-6]$/.test(tag)){ const x=txt(el); if(x) blocks.push({t:'h3',x}); }
+      else if(tag==='p'||tag==='pre'){ const x=txt(el); if(x) blocks.push({t:'p',x}); }
+      else if(tag==='blockquote'){ const x=txt(el); if(x) blocks.push({t:'quote',x}); }
+      else if(tag==='ul'||tag==='ol'){
+        const items=[...el.querySelectorAll(':scope > li')].map(txt).filter(Boolean);
+        if(items.length) blocks.push({t:tag,items});
+      }
+      else if(tag==='table'){ pushTable(el); }
+      else if(tag==='li'){ const x=txt(el); if(x) blocks.push({t:'ul',items:[x]}); }
+      else walk(el);
+    });
+  }
+  walk(d.body);
+  // fallback: page had no recognizable structure
+  if(!blocks.length){ const x=txt(d.body); if(x) return parseMd(x); }
+  return blocks;
+}
+
+/* ================= inline md -> html ================= */
 function inlineMd(s){
-  s = s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  s = s.replace(/`([^`]+)`/g,'<code>$1</code>');
-  s = s.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>').replace(/__([^_]+)__/g,'<strong>$1</strong>');
-  s = s.replace(/(^|[^*])\*([^*]+)\*/g,'$1<em>$2</em>').replace(/(^|[^_])_([^_]+)_/g,'$1<em>$2</em>');
+  s=s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  s=s.replace(/`([^`]+)`/g,'<code>$1</code>');
+  s=s.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>').replace(/__([^_]+)__/g,'<strong>$1</strong>');
+  s=s.replace(/(^|[^*])\*([^*]+)\*/g,'$1<em>$2</em>').replace(/(^|[^_\w])_([^_]+)_/g,'$1<em>$2</em>');
   return s;
 }
 
-/* ============ build + tokenize ============ */
-const doc = document.getElementById('doc');
-let tokens = [];
+/* ================= build + tokenize ================= */
+const doc=document.getElementById('doc');
+let tokens=[];
 
 function registerWordSpans(el){
   (function walk(node){
     [...node.childNodes].forEach(ch=>{
       if(ch.nodeType===3){
-        const parts = ch.textContent.split(/(\s+)/);
-        const frag = document.createDocumentFragment();
+        const parts=ch.textContent.split(/(\s+)/);
+        const frag=document.createDocumentFragment();
         parts.forEach(part=>{
-          if(part==='' ) return;
+          if(part==='') return;
           if(/^\s+$/.test(part)){ frag.appendChild(document.createTextNode(part)); return; }
           const sp=document.createElement('span'); sp.className='w'; sp.textContent=part;
           const idx=tokens.length; sp.addEventListener('click',()=>jumpTo(idx));
@@ -228,9 +427,9 @@ function registerWordSpans(el){
   })(el);
 }
 
-function render(md){
+function render(raw){
   doc.innerHTML=''; tokens=[]; idx=-1; pause();
-  const blocks = parseBlocks(md);
+  const blocks = looksLikeHtml(raw) ? parseHtml(raw) : parseMd(raw);
   blocks.forEach(b=>{
     if(b.t==='table'){
       const wrap=document.createElement('div'); wrap.className='tblwrap';
@@ -246,7 +445,7 @@ function render(md){
       tokens.push({el:wrap,dwell:8,isTable:true}); return;
     }
     if(b.t==='ul'||b.t==='ol'){
-      const ul=document.createElement(b.t==='ul'?'ul':'ol'); ul.className='list';
+      const ul=document.createElement(b.t); ul.className='list';
       b.items.forEach(it=>{ const li=document.createElement('li'); li.className='item';
         li.innerHTML=inlineMd(it); registerWordSpans(li); ul.appendChild(li); });
       doc.appendChild(ul); return;
@@ -269,16 +468,17 @@ function render(md){
   window.scrollTo(0,0);
 }
 
-/* ============ pacer ============ */
+/* ================= pacer ================= */
 let idx=-1, playing=false, timer=null, wpm=320;
 const prog=document.getElementById('prog');
 const playIcon=document.getElementById('playIcon');
 const PLAY='M8 5v14l11-7z', PAUSE='M6 5h4v14H6zM14 5h4v14h-4z';
 function base(){ return 60000/wpm; }
 function clearActive(i){ const t=tokens[i]; if(!t)return;
-  if(t.isTable) t.el.classList.remove('active'); else { t.el.classList.remove('active'); t.el.classList.add('read'); } }
-function setActive(i){ const t=tokens[i]; if(!t)return; t.el.classList.add('active');
-  t.el.scrollIntoView({block:'center',behavior:'smooth'}); }
+  if(t.isTable) t.el.classList.remove('active');
+  else { t.el.classList.remove('active'); t.el.classList.add('read'); } }
+function setActive(i){ const t=tokens[i]; if(!t)return;
+  t.el.classList.add('active'); t.el.scrollIntoView({block:'center',behavior:'smooth'}); }
 function updateProgress(){ prog.style.width = tokens.length? ((idx+1)/tokens.length*100)+'%' : '0'; }
 function step(){
   if(idx>=0) clearActive(idx);
@@ -301,52 +501,99 @@ function jumpTo(i){ clearTimeout(timer);
     if(!t.isTable){ if(k<i) t.el.classList.add('read'); else t.el.classList.remove('read'); } });
   idx=i-1; if(playing) step(); else { idx=i; setActive(i); updateProgress(); } }
 
-/* ============ wiring ============ */
+/* ================= slider fill helper ================= */
+function paintFill(r){
+  const min=+r.min, max=+r.max, v=+r.value;
+  r.style.setProperty('--fill', ((v-min)/(max-min)*100)+'%');
+}
+document.querySelectorAll('input[type=range]').forEach(r=>{
+  paintFill(r); r.addEventListener('input',()=>paintFill(r));
+});
+
+/* ================= typography settings ================= */
+const rootS=document.documentElement.style;
+const FONTS={
+  sans:'ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif',
+  serif:'Georgia,"Iowan Old Style","Times New Roman",serif',
+  mono:'ui-monospace,"SF Mono",Menlo,Consolas,monospace'
+};
+document.getElementById('fontSeg').addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b) return;
+  document.querySelectorAll('#fontSeg button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');
+  rootS.setProperty('--doc-font',FONTS[b.dataset.font]);
+});
+function bindSlider(id,valId,cssVar,fmt){
+  const r=document.getElementById(id), v=document.getElementById(valId);
+  r.addEventListener('input',()=>{ rootS.setProperty(cssVar,fmt.set(r.value)); v.textContent=fmt.show(r.value); });
+}
+bindSlider('sSize','vSize','--doc-size',{set:v=>v+'px', show:v=>v+' px'});
+bindSlider('sWidth','vWidth','--doc-width',{set:v=>v+'px', show:v=>v+' px'});
+bindSlider('sWord','vWord','--doc-word',{set:v=>v+'px', show:v=>v+' px'});
+bindSlider('sLine','vLine','--doc-line',{set:v=>v, show:v=>(+v).toFixed(2)});
+
+const panel=document.getElementById('panel');
+const settingsBtn=document.getElementById('settingsBtn');
+settingsBtn.addEventListener('click',()=>{
+  panel.classList.toggle('open');
+  settingsBtn.classList.toggle('on');
+});
+
+/* ================= wiring ================= */
 document.getElementById('play').addEventListener('click',toggle);
 document.getElementById('restart').addEventListener('click',()=>reset(true));
 document.getElementById('newtext').addEventListener('click',()=>{ pause(); document.body.classList.remove('reading'); });
 const wpmInput=document.getElementById('wpm'), wpmVal=document.getElementById('wpmVal');
-wpmInput.addEventListener('input',e=>{ wpm=+e.target.value; wpmVal.textContent=wpm; });
+wpmInput.addEventListener('input',()=>{ wpm=+wpmInput.value; wpmVal.textContent=wpm; });
 document.addEventListener('keydown',e=>{
   if(!document.body.classList.contains('reading')) return;
   if(e.code==='Space'){ e.preventDefault(); toggle(); }
-  else if(e.code==='ArrowRight'){ wpm=Math.min(700,wpm+20); wpmInput.value=wpm; wpmVal.textContent=wpm; }
-  else if(e.code==='ArrowLeft'){ wpm=Math.max(120,wpm-20); wpmInput.value=wpm; wpmVal.textContent=wpm; }
+  else if(e.code==='ArrowRight'){ wpm=Math.min(800,wpm+20); wpmInput.value=wpm; wpmVal.textContent=wpm; paintFill(wpmInput); }
+  else if(e.code==='ArrowLeft'){ wpm=Math.max(120,wpm-20); wpmInput.value=wpm; wpmVal.textContent=wpm; paintFill(wpmInput); }
 });
 
 const input=document.getElementById('input');
 document.getElementById('read').addEventListener('click',()=>{
-  const md=input.value.trim(); if(md) render(md);
+  const raw=input.value.trim(); if(raw) render(raw);
 });
 document.getElementById('upload').addEventListener('click',()=>document.getElementById('fileInput').click());
 document.getElementById('fileInput').addEventListener('change',e=>{
   const f=e.target.files[0]; if(!f) return;
   const r=new FileReader(); r.onload=()=>{ input.value=r.result; render(r.result); }; r.readAsText(f);
-});
-document.getElementById('loadSample').addEventListener('click',()=>{
-  input.value = SAMPLE; render(SAMPLE);
+  e.target.value='';
 });
 
-const SAMPLE = `# Ertelenmiş Vergi: GAAP mı, Tax mı "doğru"?
+/* drag & drop */
+const dz=document.getElementById('dropzone');
+['dragenter','dragover'].forEach(ev=>dz.addEventListener(ev,e=>{ e.preventDefault(); dz.classList.add('drag'); }));
+['dragleave','drop'].forEach(ev=>dz.addEventListener(ev,e=>{ e.preventDefault(); dz.classList.remove('drag'); }));
+dz.addEventListener('drop',e=>{
+  const f=e.dataTransfer.files[0]; if(!f) return;
+  const r=new FileReader(); r.onload=()=>{ input.value=r.result; render(r.result); }; r.readAsText(f);
+});
 
-## Asıl fikir
+/* sample */
+const SAMPLE = `# Deferred Tax: Is GAAP or Tax the "correct" one?
 
-Şirket aynı anda **iki ayrı defter** tutar ve ikisi de kendi işi için doğrudur. *Tax defteri* devlete ödediğin nakit vergiyi belirler; *GAAP defteri* yatırımcıya gösterdiğin vergi giderini.
+## The core idea
 
-> Deferred tax = iki defterin farkı çarpı vergi oranı.
+A company keeps **two separate books** at the same time, and both are correct for their own purpose. The *tax book* determines the cash tax you actually pay the government; the *GAAP book* determines the tax expense you show investors.
 
-## Amortisman karşılaştırması
+> Deferred tax = (the difference between the two books) × the tax rate.
 
-| | Yıl 1 | Yıl 2 | Yıl 3 | Toplam |
+## Depreciation comparison
+
+| | Year 1 | Year 2 | Year 3 | Total |
 |---|---|---|---|---|
 | GAAP (straight-line) | 100 | 100 | 100 | 300 |
-| Tax (double-declining) | 200 | 66,7 | 33,3 | 300 |
+| Tax (double-declining) | 200 | 66.7 | 33.3 | 300 |
 
-## Yıl 1 mantığı
+## Year 1 logic
 
-- Tax tarafında 100 fazla gider yazdın.
-- Vergiye tabi gelir 100 düşük, yani 25 daha az nakit vergi.
-- Bu tasarrufu ileride geri ödeyeceksin: bir **borç**, yani DTL.`;
+- You booked 100 more expense on the tax side.
+- Taxable income is 100 lower, so you pay 25 less cash tax.
+- You will repay that saving later: a **liability**, i.e. a DTL.`;
+document.getElementById('loadSample').addEventListener('click',()=>{ input.value=SAMPLE; render(SAMPLE); });
 </script>
 </body>
 </html>
