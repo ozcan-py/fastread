@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hızlı Okuyucu — Markdown</title>
+<style>
+  :root{
+    --paper:#FAF9F6; --ink:#22242A; --muted:#BBBFC7;
+    --marker:#FFE15D; --marker-soft:#FFF0A6;
+    --accent:#0F766E; --accent-dark:#0B5A54;
+    --line:#E7E4DC; --rule:#111318;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--paper);color:var(--ink);
+    font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;}
+
+  /* ---------- landing (paste screen) ---------- */
+  .landing{max-width:720px;margin:0 auto;padding:56px 26px}
+  .brand{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--accent);font-weight:800;margin-bottom:14px}
+  .landing h1{font-family:Georgia,serif;font-weight:700;font-size:clamp(30px,6vw,46px);line-height:1.08;margin:0 0 12px;letter-spacing:-.015em}
+  .landing p.lead{font-size:18px;line-height:1.6;color:#5c5f66;margin:0 0 26px;max-width:52ch}
+  textarea{width:100%;min-height:240px;resize:vertical;padding:18px;border:1px solid var(--line);
+    border-radius:14px;background:#fff;font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    font-size:14px;line-height:1.6;color:var(--ink);outline:none;transition:border-color .15s ease,box-shadow .15s ease}
+  textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(15,118,110,.12)}
+  .actions{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:16px}
+  .primary{appearance:none;border:none;cursor:pointer;background:var(--accent);color:#fff;
+    font-size:15px;font-weight:700;padding:13px 26px;border-radius:11px;transition:background .15s ease,transform .05s ease}
+  .primary:hover{background:var(--accent-dark)} .primary:active{transform:scale(.97)}
+  .ghost{appearance:none;cursor:pointer;background:#fff;color:var(--ink);border:1px solid var(--line);
+    font-size:14px;font-weight:600;padding:13px 18px;border-radius:11px;transition:border-color .15s ease,background .15s ease}
+  .ghost:hover{border-color:#c9c5ba;background:#fdfdfb}
+  .file{display:none}
+  .sample{margin-left:auto;font-size:13px;color:var(--accent);cursor:pointer;font-weight:600;background:none;border:none}
+  .sample:hover{text-decoration:underline}
+
+  /* ---------- reader bar ---------- */
+  .bar{position:sticky;top:0;z-index:50;background:rgba(250,249,246,.92);backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);display:none}
+  body.reading .bar{display:block}
+  body.reading .landing{display:none}
+  .progress{height:3px;background:transparent}
+  .progress i{display:block;height:100%;width:0;background:var(--rule);transition:width .12s linear}
+  .controls{max-width:760px;margin:0 auto;padding:11px 22px;display:flex;align-items:center;gap:13px;flex-wrap:wrap}
+  .play{appearance:none;border:none;cursor:pointer;width:46px;height:46px;border-radius:50%;
+    background:var(--accent);color:#fff;display:grid;place-items:center;flex:0 0 auto;transition:background .15s ease,transform .05s ease}
+  .play:hover{background:var(--accent-dark)} .play:active{transform:scale(.94)}
+  .play svg{width:20px;height:20px;fill:#fff}
+  .btn{appearance:none;cursor:pointer;border:1px solid var(--line);background:#fff;color:var(--ink);
+    padding:8px 12px;border-radius:9px;font-size:13px;font-weight:600;transition:border-color .15s ease,background .15s ease}
+  .btn:hover{border-color:#c9c5ba;background:#fdfdfb}
+  .speed{display:flex;align-items:center;gap:9px;margin-left:auto}
+  .speed label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#8a8e97;font-weight:700}
+  .speed input[type=range]{width:140px;accent-color:var(--accent)}
+  .wpm{font-variant-numeric:tabular-nums;font-weight:700;min-width:64px;text-align:right;font-size:14px}
+  .wpm b{font-size:19px} .wpm span{color:#9a9ea6;font-weight:600;font-size:12px}
+  .hint{max-width:760px;margin:0 auto;padding:0 26px;font-size:12.5px;color:#9a9ea6;margin-top:6px;display:none}
+  body.reading .hint{display:block}
+  kbd{background:#fff;border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:1px 6px;font-size:11px;font-family:inherit;font-weight:700;color:#5c5f66}
+
+  /* ---------- document ---------- */
+  .doc{max-width:760px;margin:0 auto;padding:40px 26px 40vh;display:none}
+  body.reading .doc{display:block}
+  h1.title{font-family:Georgia,serif;font-weight:700;font-size:clamp(28px,5vw,40px);line-height:1.12;letter-spacing:-.01em;margin:0 0 6px}
+  h2.h{font-family:Georgia,serif;font-weight:700;font-size:clamp(20px,3.4vw,26px);line-height:1.2;margin:44px 0 4px;letter-spacing:-.005em}
+  h2.h::before{content:"";display:block;width:34px;height:2px;background:var(--rule);margin-bottom:14px}
+  h3.h{font-family:Georgia,serif;font-weight:700;font-size:19px;margin:30px 0 2px}
+  p.para{font-size:18.5px;line-height:1.72;margin:16px 0}
+  blockquote{margin:18px 0;padding:4px 0 4px 20px;border-left:3px solid var(--accent);color:#3c3f46}
+  blockquote p{font-size:18px;line-height:1.66;margin:6px 0;font-style:italic}
+  ul.list,ol.list{margin:14px 0;padding:0;list-style:none;counter-reset:li}
+  li.item{font-size:18.5px;line-height:1.66;margin:9px 0;padding-left:28px;position:relative}
+  ul.list li.item::before{content:"";position:absolute;left:5px;top:.72em;width:7px;height:7px;background:var(--accent);border-radius:2px}
+  ol.list li.item{counter-increment:li}
+  ol.list li.item::before{content:counter(li);position:absolute;left:0;top:.05em;font-weight:800;color:var(--accent);font-size:14px}
+  strong{font-weight:700} em{font-style:italic}
+  code{background:#F0EEE7;padding:1px 6px;border-radius:5px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.88em}
+
+  .w{color:var(--muted);transition:color .18s ease;cursor:pointer;border-radius:5px;padding:1px 1px;position:relative}
+  .w.read{color:var(--ink)}
+  .w.active{color:#1a1a1a;
+    background:linear-gradient(180deg,transparent 8%,var(--marker-soft) 8%,var(--marker) 96%,transparent 96%);
+    box-shadow:0 0 0 2px var(--marker);border-radius:4px}
+  .w:hover{color:var(--ink);background:#f0eee7}
+
+  .tblwrap{margin:22px 0;border:1px solid var(--line);border-radius:12px;overflow:auto;transition:box-shadow .2s ease,border-color .2s ease}
+  .tblwrap.active{border-color:var(--marker);box-shadow:0 0 0 3px var(--marker-soft)}
+  table{width:100%;border-collapse:collapse;font-size:15px}
+  th,td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--line)}
+  thead th{background:#F3F1EA;font-weight:700;font-size:12px;letter-spacing:.03em;text-transform:uppercase;color:#5c5f66}
+  tbody tr:last-child td{border-bottom:none}
+  tbody tr:hover td{background:#fbfaf6}
+
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto} *{transition:none!important}}
+  @media (max-width:560px){
+    .speed{margin-left:0;width:100%;justify-content:space-between}
+    .speed input[type=range]{flex:1}
+    p.para,li.item{font-size:17px}
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== reader bar ===== -->
+<div class="bar">
+  <div class="progress"><i id="prog"></i></div>
+  <div class="controls">
+    <button class="play" id="play" aria-label="Oynat / Duraklat">
+      <svg id="playIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+    </button>
+    <button class="btn" id="restart">↺ Baştan</button>
+    <button class="btn" id="newtext">← Yeni metin</button>
+    <div class="speed">
+      <label for="wpm">Hız</label>
+      <input type="range" id="wpm" min="120" max="700" step="20" value="320">
+      <div class="wpm"><b id="wpmVal">320</b> <span>k/dk</span></div>
+    </div>
+  </div>
+</div>
+<p class="hint"><kbd>Boşluk</kbd> oynat/duraklat · <kbd>←</kbd> <kbd>→</kbd> hız · kelimeye tıkla → oradan başla</p>
+
+<!-- ===== landing ===== -->
+<div class="landing" id="landing">
+  <div class="brand">Hızlı Okuyucu</div>
+  <h1>Markdown yapıştır, fosforlu kalemle oku.</h1>
+  <p class="lead">Claude'da ürettiğin herhangi bir markdown'ı aşağıya yapıştır. Aktif kelime sarı ile vurgulanır, ilerledikçe kayar; hızı istediğin gibi ayarlarsın.</p>
+  <textarea id="input" placeholder="# Başlık&#10;&#10;Buraya markdown metnini yapıştır...&#10;&#10;- Madde bir&#10;- Madde iki&#10;&#10;| Kolon | Değer |&#10;|---|---|&#10;| a | 1 |"></textarea>
+  <div class="actions">
+    <button class="primary" id="read">Oku →</button>
+    <button class="ghost" id="upload">.md dosyası yükle</button>
+    <input type="file" id="fileInput" class="file" accept=".md,.markdown,.txt,text/markdown,text/plain">
+    <button class="sample" id="loadSample">Örnek metni dene</button>
+  </div>
+</div>
+
+<div class="doc" id="doc"></div>
+
+<script>
+/* ============ Markdown parser (Claude çıktısı alt kümesi) ============ */
+function parseBlocks(md){
+  const lines = md.replace(/\r\n?/g,'\n').split('\n');
+  const blocks = [];
+  let i=0;
+  const isTableSep = s => /^\s*\|?[\s:|-]*-[\s:|-]*\|?\s*$/.test(s) && s.includes('-');
+  const splitRow = s => s.replace(/^\s*\|/,'').replace(/\|\s*$/,'').split('|').map(c=>c.trim());
+
+  while(i<lines.length){
+    let line = lines[i];
+    if(line.trim()===''){ i++; continue; }
+
+    // table
+    if(/^\s*\|.*\|\s*$/.test(line) && i+1<lines.length && isTableSep(lines[i+1])){
+      const head = splitRow(line); i+=2; const rows=[];
+      while(i<lines.length && /^\s*\|.*\|\s*$/.test(lines[i])){ rows.push(splitRow(lines[i])); i++; }
+      blocks.push({t:'table', head, rows}); continue;
+    }
+    // heading
+    let m = line.match(/^(#{1,6})\s+(.*)$/);
+    if(m){ const lvl=m[1].length; blocks.push({t: lvl===1?'h1':lvl===2?'h2':'h3', x:m[2].trim()}); i++; continue; }
+    // hr
+    if(/^\s*([-*_])\1{2,}\s*$/.test(line)){ i++; continue; }
+    // blockquote
+    if(/^\s*>\s?/.test(line)){
+      const buf=[];
+      while(i<lines.length && /^\s*>\s?/.test(lines[i])){ buf.push(lines[i].replace(/^\s*>\s?/,'')); i++; }
+      blocks.push({t:'quote', x:buf.join(' ')}); continue;
+    }
+    // unordered list
+    if(/^\s*[-*+]\s+/.test(line)){
+      const items=[];
+      while(i<lines.length && /^\s*[-*+]\s+/.test(lines[i])){ items.push(lines[i].replace(/^\s*[-*+]\s+/,'')); i++; }
+      blocks.push({t:'ul', items}); continue;
+    }
+    // ordered list
+    if(/^\s*\d+\.\s+/.test(line)){
+      const items=[];
+      while(i<lines.length && /^\s*\d+\.\s+/.test(lines[i])){ items.push(lines[i].replace(/^\s*\d+\.\s+/,'')); i++; }
+      blocks.push({t:'ol', items}); continue;
+    }
+    // paragraph (gather consecutive plain lines)
+    const buf=[line]; i++;
+    while(i<lines.length && lines[i].trim()!=='' &&
+          !/^\s*#{1,6}\s+/.test(lines[i]) && !/^\s*[-*+]\s+/.test(lines[i]) &&
+          !/^\s*\d+\.\s+/.test(lines[i]) && !/^\s*>\s?/.test(lines[i]) &&
+          !/^\s*\|.*\|\s*$/.test(lines[i])){ buf.push(lines[i]); i++; }
+    blocks.push({t:'p', x:buf.join(' ')});
+  }
+  return blocks;
+}
+
+/* inline markdown -> HTML (escaped) */
+function inlineMd(s){
+  s = s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  s = s.replace(/`([^`]+)`/g,'<code>$1</code>');
+  s = s.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>').replace(/__([^_]+)__/g,'<strong>$1</strong>');
+  s = s.replace(/(^|[^*])\*([^*]+)\*/g,'$1<em>$2</em>').replace(/(^|[^_])_([^_]+)_/g,'$1<em>$2</em>');
+  return s;
+}
+
+/* ============ build + tokenize ============ */
+const doc = document.getElementById('doc');
+let tokens = [];
+
+function registerWordSpans(el){
+  (function walk(node){
+    [...node.childNodes].forEach(ch=>{
+      if(ch.nodeType===3){
+        const parts = ch.textContent.split(/(\s+)/);
+        const frag = document.createDocumentFragment();
+        parts.forEach(part=>{
+          if(part==='' ) return;
+          if(/^\s+$/.test(part)){ frag.appendChild(document.createTextNode(part)); return; }
+          const sp=document.createElement('span'); sp.className='w'; sp.textContent=part;
+          const idx=tokens.length; sp.addEventListener('click',()=>jumpTo(idx));
+          const last=part.slice(-1);
+          let dwell=1;
+          if('.!?:'.includes(last)) dwell=2.6;
+          else if(part.endsWith(',')||part.endsWith(';')) dwell=1.7;
+          tokens.push({el:sp,dwell,isTable:false});
+          frag.appendChild(sp);
+        });
+        node.replaceChild(frag,ch);
+      } else if(ch.nodeType===1){ walk(ch); }
+    });
+  })(el);
+}
+
+function render(md){
+  doc.innerHTML=''; tokens=[]; idx=-1; pause();
+  const blocks = parseBlocks(md);
+  blocks.forEach(b=>{
+    if(b.t==='table'){
+      const wrap=document.createElement('div'); wrap.className='tblwrap';
+      const tbl=document.createElement('table');
+      const thead=document.createElement('thead'); const htr=document.createElement('tr');
+      b.head.forEach(h=>{ const th=document.createElement('th'); th.innerHTML=inlineMd(h); htr.appendChild(th); });
+      thead.appendChild(htr); tbl.appendChild(thead);
+      const tb=document.createElement('tbody');
+      b.rows.forEach(r=>{ const tr=document.createElement('tr');
+        r.forEach(c=>{ const td=document.createElement('td'); td.innerHTML=inlineMd(c); tr.appendChild(td); });
+        tb.appendChild(tr); });
+      tbl.appendChild(tb); wrap.appendChild(tbl); doc.appendChild(wrap);
+      tokens.push({el:wrap,dwell:8,isTable:true}); return;
+    }
+    if(b.t==='ul'||b.t==='ol'){
+      const ul=document.createElement(b.t==='ul'?'ul':'ol'); ul.className='list';
+      b.items.forEach(it=>{ const li=document.createElement('li'); li.className='item';
+        li.innerHTML=inlineMd(it); registerWordSpans(li); ul.appendChild(li); });
+      doc.appendChild(ul); return;
+    }
+    if(b.t==='quote'){
+      const bq=document.createElement('blockquote'); const p=document.createElement('p');
+      p.innerHTML=inlineMd(b.x); registerWordSpans(p); bq.appendChild(p); doc.appendChild(bq); return;
+    }
+    let el;
+    if(b.t==='h1'){ el=document.createElement('h1'); el.className='title'; }
+    else if(b.t==='h2'){ el=document.createElement('h2'); el.className='h'; }
+    else if(b.t==='h3'){ el=document.createElement('h3'); el.className='h'; }
+    else { el=document.createElement('p'); el.className='para'; }
+    el.innerHTML=inlineMd(b.x); registerWordSpans(el);
+    if(b.t==='h1'||b.t==='h2'){ tokens.forEach(t=>{ if(t.el.parentElement===el) t.dwell=Math.max(t.dwell,1.5); }); }
+    doc.appendChild(el);
+  });
+  updateProgress();
+  document.body.classList.add('reading');
+  window.scrollTo(0,0);
+}
+
+/* ============ pacer ============ */
+let idx=-1, playing=false, timer=null, wpm=320;
+const prog=document.getElementById('prog');
+const playIcon=document.getElementById('playIcon');
+const PLAY='M8 5v14l11-7z', PAUSE='M6 5h4v14H6zM14 5h4v14h-4z';
+function base(){ return 60000/wpm; }
+function clearActive(i){ const t=tokens[i]; if(!t)return;
+  if(t.isTable) t.el.classList.remove('active'); else { t.el.classList.remove('active'); t.el.classList.add('read'); } }
+function setActive(i){ const t=tokens[i]; if(!t)return; t.el.classList.add('active');
+  t.el.scrollIntoView({block:'center',behavior:'smooth'}); }
+function updateProgress(){ prog.style.width = tokens.length? ((idx+1)/tokens.length*100)+'%' : '0'; }
+function step(){
+  if(idx>=0) clearActive(idx);
+  idx++;
+  if(idx>=tokens.length){ pause(); idx=tokens.length-1; updateProgress(); return; }
+  setActive(idx); updateProgress();
+  const t=tokens[idx];
+  const ms = base()*(t.isTable ? Math.max(8, 3200/base()) : t.dwell);
+  timer=setTimeout(step, ms);
+}
+function play(){ if(!tokens.length) return; if(idx>=tokens.length-1) reset(false);
+  playing=true; playIcon.querySelector('path').setAttribute('d',PAUSE); step(); }
+function pause(){ playing=false; clearTimeout(timer); playIcon.querySelector('path').setAttribute('d',PLAY); }
+function toggle(){ playing?pause():play(); }
+function reset(clearRead=true){ pause(); clearTimeout(timer);
+  tokens.forEach(t=>{ t.el.classList.remove('active'); if(clearRead) t.el.classList.remove('read'); });
+  idx=-1; updateProgress(); }
+function jumpTo(i){ clearTimeout(timer);
+  tokens.forEach((t,k)=>{ t.el.classList.remove('active');
+    if(!t.isTable){ if(k<i) t.el.classList.add('read'); else t.el.classList.remove('read'); } });
+  idx=i-1; if(playing) step(); else { idx=i; setActive(i); updateProgress(); } }
+
+/* ============ wiring ============ */
+document.getElementById('play').addEventListener('click',toggle);
+document.getElementById('restart').addEventListener('click',()=>reset(true));
+document.getElementById('newtext').addEventListener('click',()=>{ pause(); document.body.classList.remove('reading'); });
+const wpmInput=document.getElementById('wpm'), wpmVal=document.getElementById('wpmVal');
+wpmInput.addEventListener('input',e=>{ wpm=+e.target.value; wpmVal.textContent=wpm; });
+document.addEventListener('keydown',e=>{
+  if(!document.body.classList.contains('reading')) return;
+  if(e.code==='Space'){ e.preventDefault(); toggle(); }
+  else if(e.code==='ArrowRight'){ wpm=Math.min(700,wpm+20); wpmInput.value=wpm; wpmVal.textContent=wpm; }
+  else if(e.code==='ArrowLeft'){ wpm=Math.max(120,wpm-20); wpmInput.value=wpm; wpmVal.textContent=wpm; }
+});
+
+const input=document.getElementById('input');
+document.getElementById('read').addEventListener('click',()=>{
+  const md=input.value.trim(); if(md) render(md);
+});
+document.getElementById('upload').addEventListener('click',()=>document.getElementById('fileInput').click());
+document.getElementById('fileInput').addEventListener('change',e=>{
+  const f=e.target.files[0]; if(!f) return;
+  const r=new FileReader(); r.onload=()=>{ input.value=r.result; render(r.result); }; r.readAsText(f);
+});
+document.getElementById('loadSample').addEventListener('click',()=>{
+  input.value = SAMPLE; render(SAMPLE);
+});
+
+const SAMPLE = `# Ertelenmiş Vergi: GAAP mı, Tax mı "doğru"?
+
+## Asıl fikir
+
+Şirket aynı anda **iki ayrı defter** tutar ve ikisi de kendi işi için doğrudur. *Tax defteri* devlete ödediğin nakit vergiyi belirler; *GAAP defteri* yatırımcıya gösterdiğin vergi giderini.
+
+> Deferred tax = iki defterin farkı çarpı vergi oranı.
+
+## Amortisman karşılaştırması
+
+| | Yıl 1 | Yıl 2 | Yıl 3 | Toplam |
+|---|---|---|---|---|
+| GAAP (straight-line) | 100 | 100 | 100 | 300 |
+| Tax (double-declining) | 200 | 66,7 | 33,3 | 300 |
+
+## Yıl 1 mantığı
+
+- Tax tarafında 100 fazla gider yazdın.
+- Vergiye tabi gelir 100 düşük, yani 25 daha az nakit vergi.
+- Bu tasarrufu ileride geri ödeyeceksin: bir **borç**, yani DTL.`;
+</script>
+</body>
+</html>
