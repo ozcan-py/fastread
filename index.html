@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pace — Speed Reader & Trainer</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231A1B1E'/%3E%3Cpolygon points='13,43 20,21 53,21 46,43' fill='%23FFE06B'/%3E%3Ctext x='33' y='40' font-family='Arial,Helvetica,sans-serif' font-size='26' font-weight='800' fill='%231A1B1E' text-anchor='middle'%3EP%3C/text%3E%3C/svg%3E">
 <style>
   :root{
     --accent:#5B6CFA; --accent-2:#4C5BE0; --accent-soft:#EBEDFE;
@@ -252,6 +253,44 @@
   .goodtxt{color:var(--good);font-weight:700}
   .badtxt{color:var(--bad);font-weight:700}
 
+  /* peripheral span */
+  .pmsg{position:absolute;inset:0;display:grid;place-items:center;color:var(--ink-3);font-weight:600;font-size:15px;pointer-events:none}
+  .periph-stage{position:relative;border:1px solid var(--line);border-radius:16px;background:var(--bg);height:150px;overflow:hidden}
+  .periph-stage .pdot{position:absolute;left:50%;top:50%;width:8px;height:8px;border-radius:50%;background:var(--bad);
+    transform:translate(-50%,-50%);box-shadow:0 0 0 3px color-mix(in srgb,var(--bad) 25%,transparent);z-index:2}
+  .pword{position:absolute;top:50%;transform:translateY(-50%);font-weight:800;
+    font-size:clamp(16px,3vw,22px);white-space:nowrap;visibility:hidden;color:var(--ink)}
+  .pword.left{right:50%}
+  .pword.right{left:50%}
+
+  /* saccade hops */
+  .sacc-stage{position:relative;border:1px solid var(--line);border-radius:16px;background:var(--bg);height:380px;overflow:hidden;margin-top:4px}
+  .sacell{position:absolute;width:46px;height:46px;border-radius:50%;border:1px solid var(--line-2);background:var(--surface);
+    display:grid;place-items:center;font-weight:750;font-size:16px;cursor:pointer;user-select:none;
+    transition:background .12s ease,border-color .12s ease;color:var(--ink)}
+  .sacell:hover{border-color:var(--ink-3)}
+  .sacell.done{background:var(--accent-soft);color:var(--accent);border-color:transparent;pointer-events:none}
+  .sacell.err{background:color-mix(in srgb,var(--bad) 18%,var(--bg));border-color:var(--bad)}
+
+  /* word hunt */
+  .hunt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(98px,1fr));gap:8px;margin-top:4px}
+  .hword{appearance:none;cursor:pointer;border:1px solid var(--line-2);background:var(--bg);border-radius:9px;
+    padding:10px 4px;font-size:13.5px;font-weight:600;color:var(--ink);transition:background .12s,border-color .12s}
+  .hword:hover{border-color:var(--ink-3)}
+  .hword.found{background:var(--accent-soft);color:var(--accent);border-color:transparent;pointer-events:none}
+  .hword.err{background:color-mix(in srgb,var(--bad) 18%,var(--bg));border-color:var(--bad)}
+  .hunt-target{font-weight:800;font-size:18px;color:var(--marker-ink);padding:1px 8px;border-radius:6px;
+    background:linear-gradient(180deg,transparent 12%,var(--marker) 12%,var(--marker) 92%,transparent 92%)}
+
+  /* stroop */
+  .stroop-opts{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px}
+  .stroop-opts button{appearance:none;cursor:pointer;border:none;border-radius:12px;padding:16px 0;
+    font-weight:800;font-size:13px;letter-spacing:.05em;color:#fff;
+    transition:transform .08s ease,filter .12s ease}
+  .stroop-opts button:hover{transform:translateY(-2px);filter:brightness(1.08)}
+  .stroop-opts button:active{transform:scale(.96)}
+  .strword{font-size:clamp(28px,6vw,44px);font-weight:800;letter-spacing:.04em}
+
   @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto} *{transition:none!important}}
   @media (max-width:680px){
     .cards{grid-template-columns:1fr}
@@ -327,6 +366,10 @@
     <button class="sample" id="loadSample">Try the sample</button>
   </div>
   <div class="formats">Supported: <b>.md</b> · <b>.txt</b> · <b>.html</b> — settings &amp; training history auto-saved in this browser</div>
+  <div class="formats" style="margin-top:6px;display:flex;align-items:center;gap:6px">
+    <svg width="14" height="14" viewBox="0 0 64 64" style="flex:0 0 auto"><rect width="64" height="64" rx="14" fill="#1A1B1E"/><polygon points="13,43 20,21 53,21 46,43" fill="#FFE06B"/><text x="33" y="40" font-family="Arial,Helvetica,sans-serif" font-size="26" font-weight="800" fill="#1A1B1E" text-anchor="middle">P</text></svg>
+    <span><b>Pace v5</b> · Last updated: July 14, 2026</span>
+  </div>
 </div>
 
 <!-- ===== training ===== -->
@@ -364,11 +407,35 @@
         <div class="statline" id="st-test"></div>
         <div class="foot"><button class="primary" data-go="ex-test">Start</button><span class="spark" id="sp-test"></span></div>
       </div>
+      <div class="card">
+        <div class="top"><div class="glyph">◐</div><h3>Peripheral Span</h3></div>
+        <p class="desc">Two words flash at the edges of your vision while you hold the center dot. Correct answers push them further apart — measuring how wide you can really see.</p>
+        <div class="statline" id="st-periph"></div>
+        <div class="foot"><button class="primary" data-go="ex-periph">Start</button><span class="spark" id="sp-periph"></span></div>
+      </div>
+      <div class="card">
+        <div class="top"><div class="glyph">↔</div><h3>Saccade Hops</h3></div>
+        <p class="desc">Numbers alternate between the left and right edges — click them in order, forcing the fast, precise eye jumps and return sweeps reading depends on.</p>
+        <div class="statline" id="st-saccade"></div>
+        <div class="foot"><button class="primary" data-go="ex-saccade">Start</button><span class="spark" id="sp-saccade"></span></div>
+      </div>
+      <div class="card">
+        <div class="top"><div class="glyph">🔎</div><h3>Word Hunt</h3></div>
+        <p class="desc">Find every occurrence of the target word in a wall of lookalikes as fast as you can — the scanning and skimming muscle for real documents.</p>
+        <div class="statline" id="st-hunt"></div>
+        <div class="foot"><button class="primary" data-go="ex-hunt">Start</button><span class="spark" id="sp-hunt"></span></div>
+      </div>
+      <div class="card">
+        <div class="top"><div class="glyph">▣</div><h3>Stroop Focus</h3></div>
+        <p class="desc">Color words printed in the wrong ink — tap the ink, not the word. Classic interference training for the selective attention that keeps your eyes from wandering.</p>
+        <div class="statline" id="st-stroop"></div>
+        <div class="foot"><button class="primary" data-go="ex-stroop">Start</button><span class="spark" id="sp-stroop"></span></div>
+      </div>
     </div>
     <div class="hub-foot">
       <button class="ghost" id="exportData">Export data (JSON)</button>
       <button class="text-btn" id="clearData">Reset history</button>
-      <span class="note">Scores are stored in this browser and included in exports.</span>
+      <span class="note">Scores are stored in this browser and included in exports · Pace v5 · updated Jul 14, 2026</span>
     </div>
   </div>
 
@@ -448,13 +515,83 @@
     </div>
   </div>
 
+  <!-- peripheral span -->
+  <div class="tscreen" id="ex-periph">
+    <div class="train-top"><button class="text-btn" data-go="hub">← Training</button><h2>Peripheral Span</h2></div>
+    <div class="exwrap">
+      <p class="exp">Lock your eyes on the <b>red center dot</b> — no peeking sideways. Two words flash briefly at equal distance left and right; pick the pair you saw. <b>Correct answers push the words further apart</b>, stretching your usable visual span. 12 rounds.</p>
+      <div class="periph-stage" id="ppStage">
+        <div class="pdot"></div>
+        <span class="pword left" id="ppL"></span>
+        <span class="pword right" id="ppR"></span>
+        <span class="pmsg" id="ppMsg">Press Start</span>
+      </div>
+      <div class="fopts" id="ppOpts"></div>
+      <div class="fmeta">
+        <span>Round <b id="ppRound">–</b></span>
+        <span>Span <b id="ppSpan">160 px</b></span>
+        <span>Correct <b id="ppScore">0</b></span>
+      </div>
+      <div class="exbar"><button class="primary" id="ppStart">Start</button></div>
+      <div class="result-strip" id="ppResult" style="display:none"></div>
+    </div>
+  </div>
+
+  <!-- saccade hops -->
+  <div class="tscreen" id="ex-saccade">
+    <div class="train-top"><button class="text-btn" data-go="hub">← Training</button><h2>Saccade Hops</h2></div>
+    <div class="exwrap">
+      <p class="exp">Click the numbers <b>1 → 14 in order</b>. They alternate between the left and right edge, so every step forces a full-width eye jump — the same fast, accurate saccades and return sweeps used in real reading. Keep your head still; only the eyes move.</p>
+      <div class="exbar">
+        <div class="spacer"></div>
+        <span class="metric" id="saTimer">0.0<small> s</small></span>
+        <span class="metric" id="saErr" style="color:var(--bad)">0<small> err</small></span>
+        <button class="primary" id="saStart">Start</button>
+      </div>
+      <div class="sacc-stage" id="saStage"><span class="pmsg" id="saMsg">Press Start</span></div>
+      <div class="result-strip" id="saResult" style="display:none"></div>
+    </div>
+  </div>
+
+  <!-- word hunt -->
+  <div class="tscreen" id="ex-hunt">
+    <div class="train-top"><button class="text-btn" data-go="hub">← Training</button><h2>Word Hunt</h2></div>
+    <div class="exwrap">
+      <p class="exp">Find and click <b>every occurrence of the target word</b> — there are <b>6</b> hidden among near-lookalikes. Sweep the wall in a fast Z-pattern instead of reading word by word; wrong clicks count as errors.</p>
+      <div class="exbar">
+        <span style="font-size:13px;color:var(--ink-3);font-weight:600">Target:</span>
+        <span class="hunt-target" id="huTarget">—</span>
+        <span style="font-size:13px;color:var(--ink-3);font-weight:600" id="huLeft"></span>
+        <div class="spacer"></div>
+        <span class="metric" id="huTimer">0.0<small> s</small></span>
+        <span class="metric" id="huErr" style="color:var(--bad)">0<small> err</small></span>
+        <button class="primary" id="huStart">Start</button>
+      </div>
+      <div class="hunt-grid" id="huGrid"></div>
+      <div class="result-strip" id="huResult" style="display:none"></div>
+    </div>
+  </div>
+
+  <!-- stroop -->
+  <div class="tscreen" id="ex-stroop">
+    <div class="train-top"><button class="text-btn" data-go="hub">← Training</button><h2>Stroop Focus</h2></div>
+    <div class="exwrap">
+      <p class="exp">A color word appears printed in a <b>different ink</b>. Tap the <b>ink color</b>, not what the word says. 20 rounds against the clock — trains the selective attention that suppresses automatic habits like regression and subvocalization.</p>
+      <div class="flash-stage" id="strStage"><span style="color:var(--ink-3);font-weight:600;font-size:15px">Press Start</span></div>
+      <div class="stroop-opts" id="strOpts"></div>
+      <div class="fmeta">
+        <span>Round <b id="strRound">–</b></span>
+        <span>Errors <b id="strErrM">0</b></span>
+        <span>Avg <b id="strAvg">– ms</b></span>
+      </div>
+      <div class="exbar"><button class="primary" id="strStart">Start</button></div>
+      <div class="result-strip" id="strResult" style="display:none"></div>
+    </div>
+  </div>
+
 </div>
 
 <div class="doc" id="doc"></div>
-
-<p style="font-family: 'Noah', serif; font-size: 10px;">
-  Son Güncelleme Tarihi: 14 Temmuz 2026
-</p>  
 
 <script>
 /* ================= persistent settings ================= */
@@ -465,7 +602,7 @@ const store={
   save(){ try{ localStorage.setItem('pace-settings',JSON.stringify(S)); }catch(e){} }
 };
 /* ================= persistent training data ================= */
-let T={schulte:[],rsvp:[],flash:[],test:[]};
+let T={schulte:[],rsvp:[],flash:[],test:[],periph:[],saccade:[],hunt:[],stroop:[]};
 const tstore={
   load(){ try{ const v=JSON.parse(localStorage.getItem('pace-training')||'null'); if(v&&typeof v==='object') T={...T,...v}; }catch(e){} },
   save(){ try{ localStorage.setItem('pace-training',JSON.stringify(T)); }catch(e){} }
@@ -785,7 +922,8 @@ function spark(vals){
   return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><polyline fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="${pts}"/></svg>`;
 }
 function renderHub(){
-  const tot=T.schulte.length+T.rsvp.length+T.flash.length+T.test.length;
+  const tot=T.schulte.length+T.rsvp.length+T.flash.length+T.test.length+
+            (T.periph||[]).length+(T.saccade||[]).length+(T.hunt||[]).length+(T.stroop||[]).length;
   el('hubSub').textContent=tot? tot+' sessions logged':'No sessions yet — pick a drill';
   if(T.schulte.length){
     const last=T.schulte[T.schulte.length-1];
@@ -809,16 +947,37 @@ function renderHub(){
     el('st-test').innerHTML=`<span>Best: <b>${best} wpm</b></span><span>Last: <b>${last.wpm} wpm · ${last.comp}/3</b></span><span>Sessions: <b>${T.test.length}</b></span>`;
     el('sp-test').innerHTML=spark(T.test.map(x=>x.wpm));
   } else el('st-test').innerHTML='<span>No sessions yet</span>';
+  T.periph=T.periph||[]; T.saccade=T.saccade||[]; T.hunt=T.hunt||[]; T.stroop=T.stroop||[];
+  if(T.periph.length){
+    const last=T.periph[T.periph.length-1], best=Math.max(...T.periph.map(x=>x.span));
+    el('st-periph').innerHTML=`<span>Best span: <b>${best} px</b></span><span>Last: <b>${last.span} px · ${last.c}/${last.t}</b></span><span>Sessions: <b>${T.periph.length}</b></span>`;
+    el('sp-periph').innerHTML=spark(T.periph.map(x=>x.span));
+  } else el('st-periph').innerHTML='<span>No sessions yet</span>';
+  if(T.saccade.length){
+    const last=T.saccade[T.saccade.length-1], best=Math.min(...T.saccade.map(x=>x.t));
+    el('st-saccade').innerHTML=`<span>Best: <b>${best.toFixed(1)}s</b></span><span>Last: <b>${last.t.toFixed(1)}s · ${last.e} err</b></span><span>Sessions: <b>${T.saccade.length}</b></span>`;
+    el('sp-saccade').innerHTML=spark(T.saccade.map(x=>x.t));
+  } else el('st-saccade').innerHTML='<span>No sessions yet</span>';
+  if(T.hunt.length){
+    const last=T.hunt[T.hunt.length-1], best=Math.min(...T.hunt.map(x=>x.t));
+    el('st-hunt').innerHTML=`<span>Best: <b>${best.toFixed(1)}s</b></span><span>Last: <b>${last.t.toFixed(1)}s · ${last.e} err</b></span><span>Sessions: <b>${T.hunt.length}</b></span>`;
+    el('sp-hunt').innerHTML=spark(T.hunt.map(x=>x.t));
+  } else el('st-hunt').innerHTML='<span>No sessions yet</span>';
+  if(T.stroop.length){
+    const last=T.stroop[T.stroop.length-1], best=Math.min(...T.stroop.map(x=>x.avg));
+    el('st-stroop').innerHTML=`<span>Best avg: <b>${best} ms</b></span><span>Last: <b>${last.avg} ms · ${last.e} err</b></span><span>Sessions: <b>${T.stroop.length}</b></span>`;
+    el('sp-stroop').innerHTML=spark(T.stroop.map(x=>x.avg));
+  } else el('st-stroop').innerHTML='<span>No sessions yet</span>';
 }
 el('exportData').addEventListener('click',()=>{
-  const blob=new Blob([JSON.stringify({settings:S,training:T,exported:new Date().toISOString()},null,2)],{type:'application/json'});
+  const blob=new Blob([JSON.stringify({app:'Pace',version:'5.0',updated:'2026-07-14',settings:S,training:T,exported:new Date().toISOString()},null,2)],{type:'application/json'});
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
   a.download='pace-data-'+new Date().toISOString().slice(0,10)+'.json'; a.click();
   setTimeout(()=>URL.revokeObjectURL(a.href),4000);
 });
 el('clearData').addEventListener('click',()=>{
   if(!confirm('Delete all training history? This cannot be undone.')) return;
-  T={schulte:[],rsvp:[],flash:[],test:[]}; tstore.save(); renderHub();
+  T={schulte:[],rsvp:[],flash:[],test:[],periph:[],saccade:[],hunt:[],stroop:[]}; tstore.save(); renderHub();
 });
 
 /* ================= drill: Schulte ================= */
@@ -1065,8 +1224,232 @@ el('teStart').addEventListener('click',teStartFn);
 el('teDone').addEventListener('click',teDoneFn);
 function teStop(){ clearInterval(te.int); }
 
+/* ================= drill: Peripheral Span ================= */
+let pp={round:0,total:12,D:80,correct:0,busy:false,t1:null,t2:null,pair:null,maxD:80};
+function ppMaxD(){ const st=el('ppStage'); return Math.max(120,(st.clientWidth||640)/2-70); }
+function ppStartSession(){
+  pp.round=0; pp.correct=0; pp.D=80; pp.maxD=80; pp.busy=false;
+  el('ppScore').textContent='0'; el('ppResult').style.display='none';
+  el('ppStart').disabled=true; el('ppMsg').style.display='none';
+  ppNext();
+}
+function ppNext(){
+  pp.round++;
+  if(pp.round>pp.total){ ppFinish(); return; }
+  el('ppRound').textContent=pp.round+' / '+pp.total;
+  el('ppSpan').textContent=Math.round(pp.D*2)+' px';
+  el('ppOpts').innerHTML='';
+  const bank=shuffle([...BANK]);
+  pp.pair=[bank[0],bank[1]];
+  const L=el('ppL'), R=el('ppR');
+  L.textContent=pp.pair[0]; R.textContent=pp.pair[1];
+  L.style.marginRight=pp.D+'px'; R.style.marginLeft=pp.D+'px';
+  pp.t1=setTimeout(()=>{
+    L.style.visibility='visible'; R.style.visibility='visible';
+    pp.t2=setTimeout(()=>{
+      L.style.visibility='hidden'; R.style.visibility='hidden';
+      const correct=pp.pair.join('  ·  ');
+      function dstr(){
+        const c=[...pp.pair]; const i=Math.random()<0.5?0:1;
+        let w; do{ w=bank[2+Math.floor(Math.random()*30)]; }while(c.includes(w));
+        c[i]=w; return c.join('  ·  ');
+      }
+      let d1=dstr(), d2; do{ d2=dstr(); }while(d2===d1);
+      shuffle([correct,d1,d2]).forEach(o=>{
+        const b=document.createElement('button'); b.className='fopt'; b.textContent=o;
+        b.addEventListener('click',()=>ppChoose(b,o,correct));
+        el('ppOpts').appendChild(b);
+      });
+    },380);
+  },500);
+}
+function ppChoose(btn,o,correct){
+  if(pp.busy) return; pp.busy=true;
+  const right=o===correct;
+  btn.classList.add(right?'right':'wrong');
+  if(!right){ [...el('ppOpts').children].forEach(b=>{ if(b.textContent===correct) b.classList.add('right'); }); }
+  if(right){ pp.correct++; el('ppScore').textContent=pp.correct;
+    pp.D=Math.min(ppMaxD(),pp.D+22); pp.maxD=Math.max(pp.maxD,pp.D); }
+  else pp.D=Math.max(40,pp.D-28);
+  setTimeout(()=>{ pp.busy=false; ppNext(); },650);
+}
+function ppFinish(){
+  el('ppStart').disabled=false; el('ppOpts').innerHTML='';
+  el('ppMsg').style.display=''; el('ppMsg').textContent='Session complete';
+  const span=Math.round(pp.maxD*2);
+  T.periph.push({d:Date.now(),span,c:pp.correct,t:pp.total}); tstore.save();
+  const best=Math.max(...T.periph.map(x=>x.span));
+  el('ppResult').style.display='flex';
+  el('ppResult').innerHTML=`<span class="metric">${span}<small> px max span</small></span>
+    <span>${pp.correct} / ${pp.total} correct</span>
+    <span>${span>=best?'<span class="goodtxt">Widest span yet! ◐</span>':'Best: <b>'+best+' px</b>'}</span>`;
+}
+el('ppStart').addEventListener('click',ppStartSession);
+function ppStop(){ clearTimeout(pp.t1); clearTimeout(pp.t2); el('ppStart').disabled=false; }
+
+/* ================= drill: Saccade Hops ================= */
+let sa={count:14,next:1,errors:0,t0:0,int:null,running:false};
+function saBuild(){
+  const st=el('saStage'); st.innerHTML='';
+  const H=st.clientHeight||380;
+  const perSide=Math.ceil(sa.count/2);
+  const gap=(H-76)/(perSide-1);
+  const slotsL=shuffle(Array.from({length:perSide},(_,i)=>i));
+  const slotsR=shuffle(Array.from({length:perSide},(_,i)=>i));
+  let li=0, ri=0;
+  for(let v=1;v<=sa.count;v++){
+    const left=(v%2===1);
+    const slot=left?slotsL[li++]:slotsR[ri++];
+    const cell=document.createElement('button'); cell.className='sacell'; cell.textContent=v;
+    cell.style.top=(15+slot*gap)+'px';
+    if(left) cell.style.left='16px'; else cell.style.right='16px';
+    cell.addEventListener('click',()=>saClick(cell,v));
+    st.appendChild(cell);
+  }
+}
+function saClick(cell,v){
+  if(!sa.running) return;
+  if(v===sa.next){
+    cell.classList.add('done'); sa.next++;
+    if(sa.next>sa.count) saFinish();
+  } else {
+    sa.errors++; el('saErr').innerHTML=sa.errors+'<small> err</small>';
+    cell.classList.add('err'); setTimeout(()=>cell.classList.remove('err'),350);
+  }
+}
+function saStartFn(){
+  sa.next=1; sa.errors=0; sa.running=true; sa.t0=performance.now();
+  el('saErr').innerHTML='0<small> err</small>'; el('saResult').style.display='none';
+  saBuild();
+  clearInterval(sa.int);
+  sa.int=setInterval(()=>{ el('saTimer').innerHTML=((performance.now()-sa.t0)/1000).toFixed(1)+'<small> s</small>'; },100);
+}
+function saFinish(){
+  sa.running=false; clearInterval(sa.int);
+  const t=+((performance.now()-sa.t0)/1000).toFixed(1);
+  T.saccade.push({d:Date.now(),t,e:sa.errors}); tstore.save();
+  const best=Math.min(...T.saccade.map(x=>x.t));
+  el('saResult').style.display='flex';
+  el('saResult').innerHTML=`<span class="metric">${t}<small> s</small></span>
+    <span>${sa.errors} errors</span>
+    <span>${t<=best?'<span class="goodtxt">New personal best! ↔</span>':'Best: <b>'+best.toFixed(1)+'s</b>'}</span>`;
+}
+el('saStart').addEventListener('click',saStartFn);
+function saStop(){ sa.running=false; clearInterval(sa.int); }
+
+/* ================= drill: Word Hunt ================= */
+const NEAR={
+  margin:['market','marine','maroon','margins','martin'],
+  ledger:['leader','ledges','lodger','legend','ledgers'],
+  capital:['capitol','capsule','captain','carnival','capitals'],
+  signal:['single','signet','signals','simple','signed'],
+  harbor:['harder','arbors','labors','harbors','barber'],
+  stream:['steam','streak','strewn','streams','street']
+};
+let hu={target:'',left:0,errors:0,t0:0,int:null,running:false,total:6};
+function huStartFn(){
+  const targets=Object.keys(NEAR);
+  hu.target=targets[Math.floor(Math.random()*targets.length)];
+  hu.left=hu.total; hu.errors=0; hu.running=true; hu.t0=performance.now();
+  el('huTarget').textContent=hu.target;
+  el('huLeft').textContent=hu.left+' left';
+  el('huErr').innerHTML='0<small> err</small>'; el('huResult').style.display='none';
+  const cells=[];
+  for(let i=0;i<hu.total;i++) cells.push(hu.target);
+  const near=NEAR[hu.target];
+  for(let i=0;i<15;i++) cells.push(near[i%near.length]);
+  while(cells.length<48){
+    const w=BANK[Math.floor(Math.random()*BANK.length)];
+    if(w!==hu.target) cells.push(w);
+  }
+  shuffle(cells);
+  const g=el('huGrid'); g.innerHTML='';
+  cells.forEach(w=>{
+    const b=document.createElement('button'); b.className='hword'; b.textContent=w;
+    b.addEventListener('click',()=>huClick(b,w));
+    g.appendChild(b);
+  });
+  clearInterval(hu.int);
+  hu.int=setInterval(()=>{ el('huTimer').innerHTML=((performance.now()-hu.t0)/1000).toFixed(1)+'<small> s</small>'; },100);
+}
+function huClick(b,w){
+  if(!hu.running) return;
+  if(w===hu.target){
+    b.classList.add('found'); hu.left--;
+    el('huLeft').textContent=hu.left+' left';
+    if(hu.left===0) huFinish();
+  } else {
+    hu.errors++; el('huErr').innerHTML=hu.errors+'<small> err</small>';
+    b.classList.add('err'); setTimeout(()=>b.classList.remove('err'),350);
+  }
+}
+function huFinish(){
+  hu.running=false; clearInterval(hu.int);
+  const t=+((performance.now()-hu.t0)/1000).toFixed(1);
+  T.hunt.push({d:Date.now(),t,e:hu.errors}); tstore.save();
+  const best=Math.min(...T.hunt.map(x=>x.t));
+  el('huResult').style.display='flex';
+  el('huResult').innerHTML=`<span class="metric">${t}<small> s</small></span>
+    <span>${hu.errors} errors</span>
+    <span>${t<=best?'<span class="goodtxt">Fastest hunt yet! 🔎</span>':'Best: <b>'+best.toFixed(1)+'s</b>'}</span>`;
+}
+el('huStart').addEventListener('click',huStartFn);
+function huStop(){ hu.running=false; clearInterval(hu.int); }
+
+/* ================= drill: Stroop Focus ================= */
+const SCOLORS=[
+  {n:'RED',c:'#E5484D'},{n:'GREEN',c:'#30A46C'},
+  {n:'BLUE',c:'#3E63DD'},{n:'YELLOW',c:'#D6A319'}
+];
+let str2={round:0,total:20,errors:0,t0:0,ink:null,running:false};
+function strBuildOpts(){
+  const o=el('strOpts'); o.innerHTML='';
+  SCOLORS.forEach(col=>{
+    const b=document.createElement('button'); b.textContent=col.n;
+    b.style.background=col.c;
+    b.addEventListener('click',()=>strChoose(col));
+    o.appendChild(b);
+  });
+}
+function strStartFn(){
+  str2.round=0; str2.errors=0; str2.running=true; str2.t0=performance.now();
+  el('strErrM').textContent='0'; el('strAvg').textContent='– ms';
+  el('strResult').style.display='none'; el('strStart').disabled=true;
+  strBuildOpts(); strNext();
+}
+function strNext(){
+  str2.round++;
+  if(str2.round>str2.total){ strFinish(); return; }
+  el('strRound').textContent=str2.round+' / '+str2.total;
+  const word=SCOLORS[Math.floor(Math.random()*SCOLORS.length)];
+  let ink; do{ ink=SCOLORS[Math.floor(Math.random()*SCOLORS.length)]; }while(ink.n===word.n);
+  str2.ink=ink;
+  el('strStage').innerHTML='<span class="strword" style="color:'+ink.c+'">'+word.n+'</span>';
+}
+function strChoose(col){
+  if(!str2.running) return;
+  if(col.n===str2.ink.n){ strNext(); }
+  else { str2.errors++; el('strErrM').textContent=str2.errors; }
+}
+function strFinish(){
+  str2.running=false; el('strStart').disabled=false;
+  const t=+((performance.now()-str2.t0)/1000).toFixed(1);
+  const avg=Math.round(t*1000/str2.total);
+  el('strAvg').textContent=avg+' ms';
+  el('strStage').innerHTML='<span style="color:var(--ink-3);font-weight:600;font-size:15px">Session complete</span>';
+  el('strOpts').innerHTML='';
+  T.stroop.push({d:Date.now(),t,e:str2.errors,avg}); tstore.save();
+  const best=Math.min(...T.stroop.map(x=>x.avg));
+  el('strResult').style.display='flex';
+  el('strResult').innerHTML=`<span class="metric">${avg}<small> ms / word</small></span>
+    <span>${str2.errors} errors · ${t}s total</span>
+    <span>${avg<=best?'<span class="goodtxt">Sharpest focus yet! ▣</span>':'Best avg: <b>'+best+' ms</b>'}</span>`;
+}
+el('strStart').addEventListener('click',strStartFn);
+function strStop(){ str2.running=false; el('strStart').disabled=false; }
+
 /* stop everything when leaving a screen */
-function stopAllDrills(){ try{scStop();rvStop();flStop();teStop();}catch(e){} }
+function stopAllDrills(){ try{scStop();rvStop();flStop();teStop();ppStop();saStop();huStop();strStop();}catch(e){} }
 
 /* ================= boot ================= */
 store.load(); tstore.load();
