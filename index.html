@@ -291,6 +291,19 @@
   .stroop-opts button:active{transform:scale(.96)}
   .strword{font-size:clamp(28px,6vw,44px);font-weight:800;letter-spacing:.04em}
 
+  /* ui scale pill */
+  .ui-pill{position:fixed;right:16px;bottom:16px;z-index:80;display:flex;align-items:center;gap:2px;
+    background:var(--surface);border:1px solid var(--line-2);border-radius:99px;padding:4px;
+    box-shadow:0 6px 20px var(--shadow)}
+  .ui-pill button{appearance:none;border:none;cursor:pointer;background:transparent;color:var(--ink-2);
+    width:34px;height:34px;border-radius:50%;font-weight:800;display:grid;place-items:center;
+    transition:background .12s ease,color .12s ease}
+  .ui-pill button:hover{background:var(--hover);color:var(--ink)}
+  .ui-pill button.sm{font-size:12px}
+  .ui-pill button.lg{font-size:17px}
+  .ui-pill .uiv{font-size:11.5px;font-weight:700;color:var(--ink-3);min-width:42px;text-align:center;
+    font-variant-numeric:tabular-nums;user-select:none}
+
   @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto} *{transition:none!important}}
   @media (max-width:680px){
     .cards{grid-template-columns:1fr}
@@ -345,6 +358,8 @@
         <input type="range" id="sWord" min="0" max="14" step="1" value="0"></div>
       <div class="field"><div class="head"><span class="name">Line height</span><span class="val" id="vLine">1.72</span></div>
         <input type="range" id="sLine" min="1.3" max="2.4" step="0.02" value="1.72"></div>
+      <div class="field"><div class="head"><span class="name">Interface size (all pages)</span><span class="val" id="vUi">100%</span></div>
+        <input type="range" id="sUi" min="80" max="160" step="5" value="100"></div>
     </div>
   </div>
 </div>
@@ -368,7 +383,7 @@
   <div class="formats">Supported: <b>.md</b> · <b>.txt</b> · <b>.html</b> — settings &amp; training history auto-saved in this browser</div>
   <div class="formats" style="margin-top:6px;display:flex;align-items:center;gap:6px">
     <svg width="14" height="14" viewBox="0 0 64 64" style="flex:0 0 auto"><rect width="64" height="64" rx="14" fill="#1A1B1E"/><polygon points="13,43 20,21 53,21 46,43" fill="#FFE06B"/><text x="33" y="40" font-family="Arial,Helvetica,sans-serif" font-size="26" font-weight="800" fill="#1A1B1E" text-anchor="middle">P</text></svg>
-    <span><b>Pace v5</b> · Last updated: July 14, 2026</span>
+    <span><b>Pace v5.1</b> · Last updated: July 14, 2026</span>
   </div>
 </div>
 
@@ -435,7 +450,7 @@
     <div class="hub-foot">
       <button class="ghost" id="exportData">Export data (JSON)</button>
       <button class="text-btn" id="clearData">Reset history</button>
-      <span class="note">Scores are stored in this browser and included in exports · Pace v5 · updated Jul 14, 2026</span>
+      <span class="note">Scores are stored in this browser and included in exports · Pace v5.1 · updated Jul 14, 2026</span>
     </div>
   </div>
 
@@ -593,9 +608,15 @@
 
 <div class="doc" id="doc"></div>
 
+<div class="ui-pill" title="Interface text size — applies everywhere and is saved">
+  <button class="sm" id="uiMinus" aria-label="Smaller interface text">A−</button>
+  <span class="uiv" id="uiVal">100%</span>
+  <button class="lg" id="uiPlus" aria-label="Larger interface text">A+</button>
+</div>
+
 <script>
 /* ================= persistent settings ================= */
-const DEFAULTS={ wpm:320, font:'sans', theme:'paper', chunk:1, size:18.5, width:760, word:0, line:1.72 };
+const DEFAULTS={ wpm:320, font:'sans', theme:'paper', chunk:1, size:18.5, width:760, word:0, line:1.72, ui:100 };
 let S={...DEFAULTS};
 const store={
   load(){ try{ const v=JSON.parse(localStorage.getItem('pace-settings')||'null'); if(v&&typeof v==='object') S={...DEFAULTS,...v}; }catch(e){} },
@@ -858,6 +879,10 @@ function applySettings(){
   rootS.setProperty('--doc-width',S.width+'px'); el('sWidth').value=S.width; el('vWidth').textContent=S.width+' px'; paintFill(el('sWidth'));
   rootS.setProperty('--doc-word',S.word+'px'); el('sWord').value=S.word; el('vWord').textContent=S.word+' px'; paintFill(el('sWord'));
   rootS.setProperty('--doc-line',S.line); el('sLine').value=S.line; el('vLine').textContent=(+S.line).toFixed(2); paintFill(el('sLine'));
+  /* interface scale — zooms every page: landing, training, reader, controls */
+  document.body.style.zoom=S.ui/100;
+  el('uiVal').textContent=S.ui+'%';
+  el('sUi').value=S.ui; el('vUi').textContent=S.ui+'%'; paintFill(el('sUi'));
 }
 el('themeSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; S.theme=b.dataset.theme; applySettings(); store.save(); });
 el('fontSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; S.font=b.dataset.font; applySettings(); store.save(); });
@@ -866,6 +891,14 @@ el('sSize').addEventListener('input',()=>{ S.size=+el('sSize').value; rootS.setP
 el('sWidth').addEventListener('input',()=>{ S.width=+el('sWidth').value; rootS.setProperty('--doc-width',S.width+'px'); el('vWidth').textContent=S.width+' px'; store.save(); });
 el('sWord').addEventListener('input',()=>{ S.word=+el('sWord').value; rootS.setProperty('--doc-word',S.word+'px'); el('vWord').textContent=S.word+' px'; store.save(); });
 el('sLine').addEventListener('input',()=>{ S.line=+el('sLine').value; rootS.setProperty('--doc-line',S.line); el('vLine').textContent=(+S.line).toFixed(2); store.save(); });
+function setUi(v){ S.ui=Math.max(80,Math.min(160,v));
+  document.body.style.zoom=S.ui/100;
+  el('uiVal').textContent=S.ui+'%';
+  el('sUi').value=S.ui; el('vUi').textContent=S.ui+'%'; paintFill(el('sUi'));
+  store.save(); }
+el('sUi').addEventListener('input',()=>setUi(+el('sUi').value));
+el('uiMinus').addEventListener('click',()=>setUi(S.ui-10));
+el('uiPlus').addEventListener('click',()=>setUi(S.ui+10));
 wpmInput.addEventListener('input',()=>{ S.wpm=+wpmInput.value; wpmVal.textContent=S.wpm; store.save(); });
 el('settingsBtn').addEventListener('click',()=>{ el('panel').classList.toggle('open'); el('settingsBtn').classList.toggle('on'); });
 
@@ -970,7 +1003,7 @@ function renderHub(){
   } else el('st-stroop').innerHTML='<span>No sessions yet</span>';
 }
 el('exportData').addEventListener('click',()=>{
-  const blob=new Blob([JSON.stringify({app:'Pace',version:'5.0',updated:'2026-07-14',settings:S,training:T,exported:new Date().toISOString()},null,2)],{type:'application/json'});
+  const blob=new Blob([JSON.stringify({app:'Pace',version:'5.1',updated:'2026-07-14',settings:S,training:T,exported:new Date().toISOString()},null,2)],{type:'application/json'});
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
   a.download='pace-data-'+new Date().toISOString().slice(0,10)+'.json'; a.click();
   setTimeout(()=>URL.revokeObjectURL(a.href),4000);
