@@ -44,9 +44,56 @@
     --heat-0:#E5DBC4; --heat-1:#F7E6AE; --heat-2:#F0CC57; --heat-3:#D1A326; --heat-4:#8E6C0C;
     --shadow:rgba(63,52,36,.10); --bar-bg:rgba(249,243,230,.92);
   }
+  body[data-theme="cream"]{
+    --bg:#FBF6E8; --surface:#FFFCF3; --ink:#2B2922; --ink-2:#605C50; --ink-3:#908A7A;
+    --muted:#BDB6A3; --line:#EBE4D2; --line-2:#DDD5C0; --hover:#F2ECDA; --code-bg:#F0E9D6;
+    --marker:#FFE06B; --marker-soft:#FFF0B8; --marker-ink:#2A2410;
+    --btn:#2B2922; --btn-ink:#FFFCF3; --btn-hover:#413E35;
+    --good:#2B8A5E; --bad:#C9463D; --bad-soft:#F6DFD9;
+    --heat-0:#EDE6D3; --heat-1:#FFF0B8; --heat-2:#FFE06B; --heat-3:#E3B22C; --heat-4:#A47A10;
+    --shadow:rgba(43,41,34,.08); --bar-bg:rgba(255,252,243,.92);
+  }
+  body[data-theme="sage"]{
+    --bg:#E9EFE4; --surface:#F4F8F0; --ink:#1F2721; --ink-2:#566158; --ink-3:#85908A;
+    --muted:#B2BDB5; --line:#D8E0D3; --line-2:#C6D0C1; --hover:#DFE7DA; --code-bg:#DFE7DA;
+    --marker:#FFE06B; --marker-soft:#FFF0B8; --marker-ink:#2A2410;
+    --btn:#1F2721; --btn-ink:#F4F8F0; --btn-hover:#35403A;
+    --good:#2B8A5E; --bad:#C9463D; --bad-soft:#F1DBD6;
+    --heat-0:#DAE2D4; --heat-1:#FFF0B8; --heat-2:#FFE06B; --heat-3:#DDB12E; --heat-4:#9E7A12;
+    --shadow:rgba(31,39,33,.08); --bar-bg:rgba(244,248,240,.92);
+  }
+  body[data-theme="contrast"]{
+    --bg:#FFFFFF; --surface:#FFFFFF; --ink:#000000; --ink-2:#2A2A2A; --ink-3:#555555;
+    --muted:#7A7A7A; --line:#BDBDBD; --line-2:#8F8F8F; --hover:#EEEEEE; --code-bg:#EEEEEE;
+    --marker:#FFD500; --marker-soft:#FFF2A6; --marker-ink:#000000;
+    --btn:#000000; --btn-ink:#FFFFFF; --btn-hover:#333333;
+    --good:#1B7A4A; --bad:#B3261E; --bad-soft:#FAD4D0;
+    --heat-0:#E6E6E6; --heat-1:#FFF2A6; --heat-2:#FFD500; --heat-3:#D9A400; --heat-4:#8A6800;
+    --shadow:rgba(0,0,0,.15); --bar-bg:rgba(255,255,255,.95);
+  }
+  body[data-theme="slate"]{
+    --bg:#262A31; --surface:#2E333B; --ink:#DADDE3; --ink-2:#A3A9B3; --ink-3:#7A818C;
+    --muted:#6B717C; --line:#383E47; --line-2:#454C56; --hover:#343A43; --code-bg:#353B44;
+    --marker:#E9C64A; --marker-soft:#5C4E1E; --marker-ink:#15110A;
+    --btn:#E6E8EC; --btn-ink:#262A31; --btn-hover:#FFFFFF;
+    --good:#4CBE8E; --bad:#E0705F; --bad-soft:#4A2D2A;
+    --heat-0:#343A43; --heat-1:#4C4320; --heat-2:#7A6724; --heat-3:#B8941F; --heat-4:#E9C64A;
+    --shadow:rgba(0,0,0,.35); --bar-bg:rgba(46,51,59,.92);
+    color-scheme:dark;
+  }
+  body[data-theme="black"]{
+    --bg:#000000; --surface:#121212; --ink:#D6D6D0; --ink-2:#9C9C96; --ink-3:#6F6F6A;
+    --muted:#5E5E59; --line:#202020; --line-2:#2E2E2E; --hover:#181818; --code-bg:#1C1C1C;
+    --marker:#D9B83F; --marker-soft:#4E4015; --marker-ink:#15110A;
+    --btn:#E2E2DC; --btn-ink:#000000; --btn-hover:#FFFFFF;
+    --good:#4CBE8E; --bad:#E0705F; --bad-soft:#3E2320;
+    --heat-0:#181818; --heat-1:#3E3410; --heat-2:#6E5B18; --heat-3:#A8871C; --heat-4:#D9B83F;
+    --shadow:rgba(0,0,0,.6); --bar-bg:rgba(0,0,0,.9);
+    color-scheme:dark;
+  }
   body[data-theme="dark"]{
     --bg:#16171A; --surface:#1F2024; --ink:#E4E4DE; --ink-2:#A6A8AE; --ink-3:#7A7C83;
-    --muted:#52545B; --line:#2B2C31; --line-2:#3A3B41; --hover:#26272C; --code-bg:#2A2B30;
+    --muted:#5E6068; --line:#2B2C31; --line-2:#3A3B41; --hover:#26272C; --code-bg:#2A2B30;
     --marker:#E9C64A; --marker-soft:#5E4D18; --marker-ink:#15110A;
     --btn:#E9E9E2; --btn-ink:#16171A; --btn-hover:#FFFFFF;
     --good:#4CBE8E; --bad:#E0705F; --bad-soft:#4A2724;
@@ -266,6 +313,26 @@
     .sheet .grid .full{grid-column:1/-1}
     @keyframes pop{from{transform:scale(.97);opacity:0}to{transform:none;opacity:1}}
   }
+  .presets{display:flex;gap:.4rem;flex-wrap:wrap}
+  .preset{appearance:none;cursor:pointer;background:var(--surface);border:1px solid var(--line-2);border-radius:99px;min-height:2.25rem;padding:0 .85rem;font-size:.82rem;font-weight:600;color:var(--ink);display:inline-flex;align-items:center;gap:.35rem}
+  .preset:hover{border-color:var(--ink-3)}
+  .themes{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem}
+  @media (min-width:420px){ .themes{grid-template-columns:repeat(4,1fr)} }
+  .tchip{appearance:none;cursor:pointer;background:transparent;border:1px solid transparent;border-radius:var(--r-m);padding:.45rem .3rem .4rem;display:flex;flex-direction:column;align-items:center;gap:.35rem;color:var(--ink-2);font-size:.74rem;font-weight:600}
+  .tchip:hover{background:var(--hover)}
+  .tchip.on{border-color:var(--ink);color:var(--ink);box-shadow:0 0 0 2px var(--marker)}
+  .tchip .sw{width:2.4rem;height:2.4rem;border-radius:50%;border:1px solid rgba(0,0,0,.18);position:relative;overflow:hidden;background:var(--sw-bg)}
+  .tchip .sw::before{content:"";position:absolute;left:.55rem;top:.95rem;width:1.3rem;height:.26rem;border-radius:2px;background:var(--sw-ink)}
+  .tchip .sw::after{content:"";position:absolute;left:.55rem;top:1.4rem;width:.8rem;height:.26rem;border-radius:2px;background:var(--sw-marker)}
+  .tchip .sw.auto{background:linear-gradient(90deg,#F4F3EF 50%,#16171A 50%)}
+  .tchip .sw.auto::before{background:linear-gradient(90deg,#1E2024 50%,#E4E4DE 50%)}
+  .fonts{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
+  .fcard{appearance:none;cursor:pointer;text-align:left;background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-m);padding:.6rem .7rem;color:var(--ink);min-height:3.6rem}
+  .fcard:hover{border-color:var(--ink-3)}
+  .fcard.on{border-color:var(--ink);box-shadow:0 0 0 2px var(--marker)}
+  .fcard .n{display:block;font-size:1.02rem;font-weight:600;line-height:1.2}
+  .fcard .n em{font-weight:400;font-style:italic}
+  .fcard .s{display:block;font-size:.7rem;color:var(--ink-3);font-family:var(--font);margin-top:.25rem;line-height:1.3}
   .only-desktop{display:none}
   @media (min-width:760px){ .only-desktop{display:flex} }
   .msg{font-size:.85rem;line-height:1.5;padding:.7rem .85rem;border-radius:var(--r-m);background:var(--hover);color:var(--ink-2)}
@@ -280,6 +347,29 @@
     transition:opacity .2s ease,transform .2s ease;max-width:calc(100% - 2rem);text-align:center}
   .toast.show{opacity:1;transform:translateX(-50%)}
   @media (min-width:760px){ .toast{bottom:1.5rem} }
+  .toast.act{display:flex;align-items:center;gap:.8rem;padding:.4rem .45rem .4rem 1rem;text-align:left}
+  .toast.show.act{pointer-events:auto}
+  .toast .tact{appearance:none;border:none;cursor:pointer;background:var(--marker);color:var(--marker-ink);border-radius:99px;padding:0 .9rem;min-height:2.25rem;font-weight:700;font-size:.85rem}
+  .rlist{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:var(--r-m);overflow:hidden;background:var(--surface)}
+  .rlist label.check{padding:0 .85rem;border-bottom:1px solid var(--line);min-height:2.75rem;color:var(--ink)}
+  .rlist label.check:last-child{border-bottom:none}
+  .rlist label.check.all{background:var(--hover);font-weight:700}
+  .rlist .cnt{margin-left:auto;color:var(--ink-3);font-variant-numeric:tabular-nums;font-size:.82rem;font-weight:600}
+  .btn.dangerfill{background:var(--bad);border-color:var(--bad);color:var(--btn-ink)}
+  .btn.dangerfill:hover{filter:brightness(1.07);border-color:var(--bad)}
+  .sheet .group.ub{border-top:1px solid var(--line);padding-top:1rem;margin-top:1.25rem}
+  .ulist{display:flex;flex-direction:column;gap:.45rem;margin-top:.4rem}
+  .urow{display:flex;align-items:center;gap:.75rem;padding:.5rem .5rem .5rem .8rem;border:1px solid var(--line);border-radius:var(--r-m);background:var(--surface)}
+  .urow .t{flex:1;min-width:0;display:flex;flex-direction:column;gap:.1rem}
+  .urow .t b{font-size:.86rem;font-weight:600;overflow-wrap:anywhere}
+  .result .disc{appearance:none;background:none;border:none;padding:.3rem 0;font:inherit;font-size:.82rem;color:inherit;opacity:.75;text-decoration:underline;text-underline-offset:2px;cursor:pointer;margin-left:auto}
+  .result .next~.disc{margin-left:0}
+  .result .disc:hover{opacity:1}
+  .tbl th.x,.tbl td.x{width:2.4rem;padding:0;text-align:right}
+  .rowdel{appearance:none;background:none;border:none;color:var(--ink-3);width:2.25rem;height:2.25rem;border-radius:var(--r-s);cursor:pointer;display:inline-grid;place-items:center;vertical-align:middle}
+  .rowdel:hover{color:var(--bad);background:var(--hover)}
+  .rowdel svg.i{width:1rem;height:1rem}
+  .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 
   /* ================= training hub ================= */
   .circuit{border:1px solid var(--line-2);border-radius:var(--r-l);padding:1rem 1.1rem;background:var(--surface);display:flex;flex-direction:column;gap:.75rem;margin-bottom:1.5rem;position:relative;overflow:hidden}
@@ -525,7 +615,7 @@
       </div>
       <div class="home-foot">
         <p class="fine" id="homeSync"></p>
-        <p class="fine">Pace 6.1. Display settings stay on this device; scores live in your GitHub repository.</p>
+        <p class="fine">Pace 6.3. Display settings stay on this device; scores live in your GitHub repository.</p>
       </div>
     </div>
   </section>
@@ -771,14 +861,27 @@
     <div class="phead"><h3 id="settingsH">Settings</h3><button class="btn icon text sm" data-close aria-label="Close"><svg class="i"><use href="#i-x"/></svg></button></div>
     <div class="group">Reading</div>
     <div class="grid">
+      <div class="f full"><div class="head"><span>Presets</span></div>
+        <div class="presets" id="presetRow"></div>
+        <details class="help" id="readHelp"><summary>What works for reading</summary>
+          <ol>
+            <li><b>Size and spacing beat typeface.</b> 18–22 px text, line height 1.5–1.7 and 50–70 characters per line. Longer lines make the return sweep miss; shorter ones force too many stops.</li>
+            <li><b>Dark text on a light page</b> reads a little faster and with fewer errors in a lit room: the pupil is smaller, so the letters are sharper. Switch to Slate, Dark or Black when the room is dim and glare is the problem.</li>
+            <li><b>Off-white beats pure white</b> for long sessions (Paper, Cream, Sepia, Sage). Contrast is for sunlight on a phone or low vision.</li>
+            <li><b>The font you know reads fastest.</b> Tall-x-height sans faces (Inter, Lexend, Atkinson) stay clear at small sizes; Literata and Merriweather were drawn for screens and suit long texts.</li>
+            <li><b>If letters swap or you lose the line</b> (b/d, I/l): Atkinson Hyperlegible, 2–4 px word spacing and line height 1.7 or more.</li>
+          </ol>
+        </details>
+      </div>
       <div class="f full"><div class="head"><span>Speed</span><span class="val num"><span id="vWpm">320</span> wpm</span></div><input type="range" id="sWpm" min="120" max="800" step="20" value="320"></div>
       <div class="f"><div class="head"><span>Words per step</span><span class="val" id="vChunk">1 word</span></div><input type="range" id="sChunk" min="1" max="8" step="1" value="1"></div>
       <div class="f"><div class="head"><span>Text size</span><span class="val num" id="vSize">18.5 px</span></div><input type="range" id="sSize" min="14" max="28" step="0.5" value="18.5"></div>
       <div class="f"><div class="head"><span>Line height</span><span class="val num" id="vLine">1.72</span></div><input type="range" id="sLine" min="1.3" max="2.4" step="0.02" value="1.72"></div>
       <div class="f"><div class="head"><span>Word spacing</span><span class="val num" id="vWord">0 px</span></div><input type="range" id="sWord" min="0" max="14" step="1" value="0"></div>
       <div class="f only-desktop"><div class="head"><span>Page width</span><span class="val num" id="vWidth">760 px</span></div><input type="range" id="sWidth" min="560" max="1200" step="20" value="760"></div>
-      <div class="f full"><div class="head"><span>Text font</span></div>
-        <div class="seg" id="fontSeg"><button data-font="sans" class="on">Sans</button><button data-font="serif" class="f-serif">Serif</button><button data-font="mono" class="f-mono">Mono</button></div></div>
+      <div class="f full"><div class="head"><span>Text font</span><span class="val" id="vFont"></span></div>
+        <div class="fonts" id="fontGrid"></div>
+        <p class="fine" style="margin-top:.4rem">Downloaded fonts come from Google Fonts the first time you pick them; if the network blocks it, the closest built-in font is used.</p></div>
     </div>
     <div class="group">Training</div>
     <div class="grid">
@@ -788,13 +891,9 @@
     </div>
     <div class="group">Display</div>
     <div class="grid">
-      <div class="f full"><div class="head"><span>Theme</span></div>
-        <div class="seg" id="themeSeg">
-          <button data-theme="paper"><span class="swatch" style="background:#F4F3EF"></span>Paper</button>
-          <button data-theme="sepia"><span class="swatch" style="background:#F1E9D8"></span>Sepia</button>
-          <button data-theme="dark"><span class="swatch" style="background:#16171A"></span>Dark</button>
-          <button data-theme="auto">Auto</button>
-        </div></div>
+      <div class="f full"><div class="head"><span>Theme</span><span class="val" id="vTheme"></span></div>
+        <div class="themes" id="themeGrid"></div>
+        <p class="fine" id="themeNote" style="margin-top:.4rem"></p></div>
       <div class="f full"><div class="head"><span>Interface size</span><span class="val num" id="vUi">100%</span></div><input type="range" id="sUi" min="80" max="160" step="5" value="100"></div>
     </div>
     <p class="fine" style="margin-top:1rem">These settings stay on this device. Scores are saved to GitHub.</p>
@@ -806,7 +905,7 @@
   <div class="panel">
     <div class="grab"></div>
     <div class="phead"><svg class="i"><use href="#i-github"/></svg><h3 id="ghH">Save scores to GitHub</h3><button class="btn icon text sm" data-close aria-label="Close"><svg class="i"><use href="#i-x"/></svg></button></div>
-    <p class="fine" style="margin-bottom:1rem">Every finished drill is committed as a JSON file in a repository you own. Nothing is kept in this browser's storage except the connection below, so the same history shows up on every device you connect.</p>
+    <p class="fine" style="margin-bottom:1rem">Every finished drill is committed to a JSON file in a repository you own, so the same history shows up on every device you connect. This browser keeps only the connection below, plus a short queue if a save fails.</p>
     <div class="grid">
       <label class="field">Repository<input type="text" id="ghRepo" placeholder="username/pace-data" autocapitalize="off" autocomplete="off" spellcheck="false"></label>
       <label class="field">File path<input type="text" id="ghPath" value="pace-data.json" autocapitalize="off" autocomplete="off" spellcheck="false"></label>
@@ -831,6 +930,22 @@
   </div>
 </div>
 
+<!-- reset sheet -->
+<div class="sheet" id="resetSheet" role="dialog" aria-modal="true" aria-labelledby="resetH">
+  <div class="panel">
+    <div class="grab"></div>
+    <div class="phead"><h3 id="resetH">Reset history</h3><button class="btn icon text sm" data-close aria-label="Close"><svg class="i"><use href="#i-x"/></svg></button></div>
+    <p class="fine" style="margin-bottom:.8rem">Pick the drills to clear. Cleared sessions disappear on every device you connect, and you can undo it.</p>
+    <div class="rlist" id="resetList"></div>
+    <div class="exbar" style="margin:1rem 0 0">
+      <button class="btn dangerfill" id="resetGo">Reset</button>
+      <button class="btn text" data-close>Cancel</button>
+    </div>
+    <p class="fine" id="resetNote" style="margin-top:.8rem"></p>
+    <div id="undoBlock"></div>
+  </div>
+</div>
+
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script>
 'use strict';
@@ -842,8 +957,14 @@ function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').rep
 function dayKey(ms){ const d=new Date(ms); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 function fmtDate(ms){ return new Date(ms).toLocaleDateString(undefined,{month:'short',day:'numeric'}); }
 function ago(ms){ const s=Math.round((Date.now()-ms)/1000); if(s<45) return 'just now'; const m=Math.round(s/60); if(m<60) return m+' min ago'; const h=Math.round(m/60); if(h<24) return h+' h ago'; return fmtDate(ms); }
+function fmtStamp(ms){ return new Date(ms).toLocaleString(undefined,{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}); }
 let toastT=null;
-function toast(msg){ const t=el('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),2600); }
+function toast(msg,opt={}){
+  const t=el('toast'); t.textContent=msg; t.classList.toggle('act',!!opt.action);
+  if(opt.action){ const b=document.createElement('button'); b.type='button'; b.className='tact'; b.textContent=opt.action;
+    b.addEventListener('click',()=>{ t.classList.remove('show'); clearTimeout(toastT); opt.onAction(); }); t.appendChild(b); }
+  t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),opt.action?9000:2600);
+}
 
 /* ================= device settings (this browser only) ================= */
 const DEFAULTS={ wpm:320, font:'sans', theme:'paper', chunk:1, size:18.5, width:760, word:0, line:1.72, ui:100, lang:'en' };
@@ -856,18 +977,55 @@ const store={
 /* ================= training data (lives in GitHub; in memory here) ================= */
 const DRILLS=['schulte','rsvp','flash','test','periph','saccade','hunt','stroop'];
 const NAMES={schulte:'Schulte Table',rsvp:'RSVP Flow',flash:'Flash Recognition',test:'Speed Test',periph:'Peripheral Span',saccade:'Saccade Hops',hunt:'Word Hunt',stroop:'Stroop Focus'};
+/* Adding a session is a plain union across devices. Removals have to travel too, or a device
+   that still holds old sessions (a tab left open, a phone that was offline) would put them back
+   on its next save. Each drill therefore also carries three small records that merge by
+   "latest wins":
+     resets   {cut: undoneAt}  hides every session recorded up to `cut`; 0 = still in force
+     deleted  {d: when}        one session removed
+     restored {d: when}        one session brought back
+   A session shows unless its latest removal is newer than its latest restore. */
 const emptyT=()=>Object.fromEntries(DRILLS.map(k=>[k,[]]));
+const emptyMaps=()=>Object.fromEntries(DRILLS.map(k=>[k,{}]));
 let T=emptyT();
-function mergeT(a,b){
-  const out=emptyT();
+let M={resets:emptyMaps(),deleted:emptyMaps(),restored:emptyMaps()};
+function numMap(m,keepZero){ const o={}; if(m&&typeof m==='object') for(const [k,v] of Object.entries(m)){ const kk=+k, vv=+v; if(kk>0&&Number.isFinite(vv)&&(vv>0||(keepZero&&vv===0))) o[kk]=vv; } return o; }
+function normState(x){
+  const st={training:emptyT(),resets:emptyMaps(),deleted:emptyMaps(),restored:emptyMaps()};
+  if(!x||typeof x!=='object') return st;
+  const tr=(x.training&&typeof x.training==='object')?x.training:(DRILLS.some(k=>Array.isArray(x[k]))?x:null);
   for(const k of DRILLS){
+    if(tr&&Array.isArray(tr[k])) st.training[k]=tr[k].filter(e=>e&&typeof e==='object'&&typeof e.d==='number');
+    st.resets[k]=numMap(x.resets&&x.resets[k],true);
+    st.deleted[k]=numMap(x.deleted&&x.deleted[k]);
+    st.restored[k]=numMap(x.restored&&x.restored[k]);
+  }
+  return st;
+}
+function maxMerge(a,b){ const o={...a}; for(const [k,v] of Object.entries(b)) o[k]=k in o?Math.max(o[k],v):v; return o; }
+function removedAt(st,k,d){
+  let r=0; for(const [c,u] of Object.entries(st.resets[k])) if(u===0&&d<=+c&&+c>r) r=+c;
+  const del=st.deleted[k][d]||0; return del>r?del:r;
+}
+function isShown(st,k,d){ const r=removedAt(st,k,d); return !r||(st.restored[k][d]||0)>r; }
+function mergeState(a,b){
+  a=normState(a); b=normState(b);
+  const out={training:emptyT(),resets:emptyMaps(),deleted:emptyMaps(),restored:emptyMaps()};
+  for(const k of DRILLS){
+    out.resets[k]=maxMerge(a.resets[k],b.resets[k]);
+    out.deleted[k]=maxMerge(a.deleted[k],b.deleted[k]);
+    out.restored[k]=maxMerge(a.restored[k],b.restored[k]);
     const seen=new Set();
-    out[k]=[...(a&&a[k]||[]),...(b&&b[k]||[])].filter(x=>x&&typeof x.d==='number'&&!seen.has(x.d)&&seen.add(x.d)).sort((x,y)=>x.d-y.d);
+    out.training[k]=[...a.training[k],...b.training[k]].filter(x=>!seen.has(x.d)&&seen.add(x.d)&&isShown(out,k,x.d)).sort((x,y)=>x.d-y.d);
   }
   return out;
 }
+const stateNow=()=>({training:T,resets:M.resets,deleted:M.deleted,restored:M.restored});
+function setState(st){ T=st.training; M={resets:st.resets,deleted:st.deleted,restored:st.restored}; }
+const snapshot=()=>mergeState(stateNow(),null);
+function sortedMap(m){ return Object.fromEntries(Object.entries(m).sort((x,y)=>+x[0]-+y[0])); }
+function canon(st){ const n=mergeState(st,null); return JSON.stringify([n.training,...['resets','deleted','restored'].map(f=>DRILLS.map(k=>sortedMap(n[f][k])))]); }
 function totalSessions(t=T){ return DRILLS.reduce((n,k)=>n+t[k].length,0); }
-function sameT(a,b){ return JSON.stringify(mergeT(a,{}))===JSON.stringify(mergeT(b,{})); }
 
 /* ================= md / html parsing ================= */
 function parseMd(md){
@@ -1106,7 +1264,7 @@ function showScreen(id){
 $$('[data-go]').forEach(b=>b.addEventListener('click',()=>showScreen(b.dataset.go)));
 
 /* ================= sheets ================= */
-function openSheet(id){ el(id).classList.add('open'); document.body.style.overflow='hidden'; }
+function openSheet(id){ el(id).classList.add('open'); document.body.style.overflow='hidden'; if(id==='settings') Object.keys(FONTS).forEach(ensureFont); }
 function closeSheets(){ $$('.sheet.open').forEach(s=>s.classList.remove('open')); document.body.style.overflow=''; }
 $$('.sheet').forEach(s=>{ s.addEventListener('click',e=>{ if(e.target===s) closeSheets(); }); });
 $$('[data-close]').forEach(b=>b.addEventListener('click',closeSheets));
@@ -1119,18 +1277,57 @@ el('typeBtn').addEventListener('click',()=>openSheet('settings'));
 function paintFill(r){ const min=+r.min,max=+r.max,v=+r.value; r.style.setProperty('--fill',((v-min)/(max-min)*100)+'%'); }
 $$('input[type=range]').forEach(r=>{ paintFill(r); r.addEventListener('input',()=>paintFill(r)); });
 const rootS=document.documentElement.style;
-const FONTS={sans:'ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif',
-  serif:'Georgia,"Iowan Old Style","Times New Roman",serif',
-  mono:'ui-monospace,"SF Mono",Menlo,Consolas,monospace'};
+/* text fonts: the first three need no download; the rest load from Google Fonts when picked */
+const FONTS={
+  sans:{name:'System',stack:'ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif',note:'Your device\'s own font. Nothing to download.'},
+  serif:{name:'Georgia',stack:'Georgia,"Iowan Old Style","Times New Roman",serif',note:'Classic screen serif. Nothing to download.'},
+  mono:{name:'Mono',stack:'ui-monospace,"SF Mono",Menlo,Consolas,monospace',note:'Fixed width; every letter gets the same space.'},
+  inter:{name:'Inter',stack:'"Inter",ui-sans-serif,system-ui,sans-serif',gf:'Inter:wght@400;600;700',note:'Screen sans with a tall x-height. Clear at small sizes.'},
+  lexend:{name:'Lexend',stack:'"Lexend",ui-sans-serif,system-ui,sans-serif',gf:'Lexend:wght@400;600;700',note:'Drawn to raise reading fluency: wide, open letters.'},
+  atkinson:{name:'Atkinson Hyperlegible',stack:'"Atkinson Hyperlegible",Verdana,ui-sans-serif,sans-serif',gf:'Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700',note:'Letters built to be hard to confuse: b d, I l 1, O 0.'},
+  literata:{name:'Literata',stack:'"Literata",Georgia,"Iowan Old Style",serif',gf:'Literata:ital,wght@0,400;0,700;1,400;1,700',note:'Serif made for e-readers. Comfortable in long texts.'},
+  merriweather:{name:'Merriweather',stack:'"Merriweather",Georgia,serif',gf:'Merriweather:ital,wght@0,400;0,700;1,400;1,700',note:'Screen serif with sturdy strokes; holds up on dim displays.'}
+};
+const fontsLoaded=new Set();
+function ensureFont(k){ const f=FONTS[k]; if(!f||!f.gf||fontsLoaded.has(k)) return; fontsLoaded.add(k);
+  const l=document.createElement('link'); l.rel='stylesheet'; l.href='https://fonts.googleapis.com/css2?family='+f.gf+'&display=swap'; document.head.appendChild(l); }
+const THEMES=[
+  {id:'paper',name:'Paper',bg:'#F4F3EF',ink:'#1E2024',marker:'#FFE06B',note:'Neutral off-white. The daytime default.'},
+  {id:'cream',name:'Cream',bg:'#FBF6E8',ink:'#2B2922',marker:'#FFE06B',note:'Warm ivory with the least glare. Good for long sessions.'},
+  {id:'sepia',name:'Sepia',bg:'#F1E9D8',ink:'#3F3424',marker:'#F6C94A',note:'Tan, like an e-reader with a warm light.'},
+  {id:'sage',name:'Sage',bg:'#E9EFE4',ink:'#1F2721',marker:'#FFE06B',note:'Cool green-grey; calm in bright rooms.'},
+  {id:'slate',name:'Slate',bg:'#262A31',ink:'#DADDE3',marker:'#E9C64A',note:'Dusk grey: softer than black for the evening.'},
+  {id:'dark',name:'Dark',bg:'#16171A',ink:'#E4E4DE',marker:'#E9C64A',note:'For dim rooms, where glare is the problem.'},
+  {id:'black',name:'Black',bg:'#000000',ink:'#D6D6D0',marker:'#D9B83F',note:'True black for OLED screens late at night.'},
+  {id:'contrast',name:'Contrast',bg:'#FFFFFF',ink:'#000000',marker:'#FFD500',note:'Maximum contrast for sunlight on a phone or low vision.'},
+  {id:'auto',name:'Auto',note:'Paper by day, Dark when the device switches to dark mode.'}
+];
+const PRESETS={
+  day:{label:'Daylight',set:{theme:'paper',font:'inter',size:19,line:1.6,width:660,word:0}},
+  long:{label:'Long read',set:{theme:'cream',font:'literata',size:20,line:1.65,width:640,word:0}},
+  night:{label:'Night',set:{theme:'dark',font:'lexend',size:19.5,line:1.65,width:640,word:0}},
+  easy:{label:'Easy on the eyes',set:{theme:'cream',font:'atkinson',size:20,line:1.8,width:620,word:3}}
+};
 const mq=window.matchMedia('(prefers-color-scheme: dark)');
-function applyTheme(){ const t=S.theme==='auto'?(mq.matches?'dark':'paper'):S.theme; document.body.dataset.theme=t;
-  $$('#themeSeg button').forEach(b=>b.classList.toggle('on',b.dataset.theme===S.theme)); }
+function applyTheme(){
+  if(!THEMES.some(t=>t.id===S.theme)) S.theme='paper';
+  const t=S.theme==='auto'?(mq.matches?'dark':'paper'):S.theme; document.body.dataset.theme=t;
+  const th=THEMES.find(x=>x.id===t); $$('meta[name=theme-color]').forEach(m=>m.setAttribute('content',th.bg));
+  $$('#themeGrid .tchip').forEach(b=>b.classList.toggle('on',b.dataset.theme===S.theme));
+  const cur=THEMES.find(x=>x.id===S.theme); el('vTheme').textContent=cur.name; el('themeNote').textContent=cur.note;
+}
 mq.addEventListener('change',()=>{ if(S.theme==='auto') applyTheme(); });
+function buildPickers(){
+  el('themeGrid').innerHTML=THEMES.map(t=>`<button type="button" class="tchip" data-theme="${t.id}" title="${esc(t.note)}"><span class="sw${t.id==='auto'?' auto':''}" style="${t.bg?`--sw-bg:${t.bg};--sw-ink:${t.ink};--sw-marker:${t.marker}`:''}"></span>${t.name}</button>`).join('');
+  el('fontGrid').innerHTML=Object.entries(FONTS).map(([k,f])=>`<button type="button" class="fcard" data-font="${k}" style="font-family:${esc(f.stack)}"><span class="n">${esc(f.name)} <em>Aa</em></span><span class="s">${esc(f.note)}</span></button>`).join('');
+  el('presetRow').innerHTML=Object.entries(PRESETS).map(([k,p])=>`<button type="button" class="preset" data-preset="${k}">${p.label}</button>`).join('');
+}
 function setRange(id,val,label,text){ const r=el(id); r.value=val; paintFill(r); if(label) el(label).textContent=text; }
 function applySettings(){
   applyTheme();
-  rootS.setProperty('--doc-font',FONTS[S.font]||FONTS.sans);
-  $$('#fontSeg button').forEach(b=>b.classList.toggle('on',b.dataset.font===S.font));
+  if(!FONTS[S.font]) S.font='sans';
+  ensureFont(S.font); rootS.setProperty('--doc-font',FONTS[S.font].stack);
+  $$('#fontGrid .fcard').forEach(b=>b.classList.toggle('on',b.dataset.font===S.font)); el('vFont').textContent=FONTS[S.font].name;
   $$('#langSeg button').forEach(b=>b.classList.toggle('on',b.dataset.lang===S.lang));
   setRange('sWpm',S.wpm,'vWpm',S.wpm); el('wpmVal').textContent=S.wpm;
   setRange('sChunk',S.chunk,'vChunk',S.chunk+(S.chunk>1?' words':' word'));
@@ -1140,8 +1337,9 @@ function applySettings(){
   rootS.setProperty('--doc-line',S.line); setRange('sLine',S.line,'vLine',(+S.line).toFixed(2));
   rootS.setProperty('--ui',S.ui/100); setRange('sUi',S.ui,'vUi',S.ui+'%');
 }
-el('themeSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; S.theme=b.dataset.theme; applySettings(); store.save(); });
-el('fontSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; S.font=b.dataset.font; applySettings(); store.save(); });
+el('themeGrid').addEventListener('click',e=>{ const b=e.target.closest('.tchip'); if(!b) return; S.theme=b.dataset.theme; applySettings(); store.save(); });
+el('fontGrid').addEventListener('click',e=>{ const b=e.target.closest('.fcard'); if(!b) return; S.font=b.dataset.font; applySettings(); store.save(); });
+el('presetRow').addEventListener('click',e=>{ const b=e.target.closest('.preset'); if(!b) return; const p=PRESETS[b.dataset.preset]; Object.assign(S,p.set); applySettings(); store.save(); toast(p.label+' preset applied'); });
 el('langSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; if(S.lang===b.dataset.lang) return; S.lang=b.dataset.lang; applySettings(); store.save(); stopAllDrills(); rvResetFn(); el('rvNote').textContent=''; toast(S.lang==='tr'?'Drills now use Turkish words and passages':'Drills now use English words and passages'); });
 el('sChunk').addEventListener('input',()=>{ S.chunk=+el('sChunk').value; el('vChunk').textContent=S.chunk+(S.chunk>1?' words':' word'); store.save(); });
 el('sSize').addEventListener('input',()=>{ S.size=+el('sSize').value; rootS.setProperty('--doc-size',S.size+'px'); el('vSize').textContent=S.size+' px'; store.save(); });
@@ -1237,19 +1435,23 @@ async function ghPull(){
   if(r.data.content){ txt=b64dec(r.data.content); }
   else { const raw=await ghApi('GET',ghContentsPath()+q,null,'application/vnd.github.raw+json'); if(!raw.ok) throw new GhError('Could not download the data file.'); txt=raw.text; }
   let parsed=null; try{ parsed=JSON.parse(txt); }catch(e){ throw new GhError('The data file is not valid JSON. Fix or delete '+GH.cfg.path+' in the repository.'); }
-  const remote=parsed&&parsed.training&&typeof parsed.training==='object'?parsed.training:emptyT();
   GH.lastPull=Date.now();
-  return {remote:mergeT(remote,{}),sha:r.data.sha};
+  return {remote:mergeState(parsed,null),sha:r.data.sha};
 }
-function serialize(){ return JSON.stringify({app:'Pace',version:'6.1',updated:new Date().toISOString(),sessions:totalSessions(),training:T},null,1); }
+function serialize(){
+  const st=snapshot(), meta={};
+  for(const f of ['resets','deleted','restored']){ const o={}; DRILLS.forEach(k=>{ if(Object.keys(st[f][k]).length) o[k]=sortedMap(st[f][k]); }); if(Object.keys(o).length) meta[f]=o; }
+  return JSON.stringify({app:'Pace',version:'6.3',updated:new Date().toISOString(),sessions:totalSessions(st.training),training:st.training,...meta},null,1);
+}
+function clearLocalCopies(){ try{ localStorage.removeItem(OUTBOX_KEY); localStorage.removeItem(LEGACY_KEY); }catch(e){} legacyCount=0; }
 function setSync(state,err){ GH.state=state; if(err!==undefined) GH.err=err; renderSync(); }
 async function ghPushNow(msg,attempt=0){
   if(!GH.cfg) return false;
   setSync('syncing');
   try{
     const {remote,sha}=await ghPull();
-    if(remote){ T=mergeT(T,remote); }
-    if(remote&&sha&&sameT(T,remote)){ GH.sha=sha; GH.last=Date.now(); GH.pending=false; try{localStorage.removeItem(OUTBOX_KEY);}catch(e){} setSync('ok',''); afterSync(); return true; }
+    if(remote) setState(mergeState(stateNow(),remote));
+    if(remote&&sha&&canon(stateNow())===canon(remote)){ GH.sha=sha; GH.last=Date.now(); GH.pending=false; clearLocalCopies(); setSync('ok',''); afterSync(); return true; }
     const body={message:msg,content:b64enc(serialize())};
     if(sha) body.sha=sha;
     if(GH.cfg.branch) body.branch=GH.cfg.branch;
@@ -1257,36 +1459,45 @@ async function ghPushNow(msg,attempt=0){
     if((r.status===409||r.status===422)&&attempt<2) return ghPushNow(msg,attempt+1);
     if(!r.ok) throw new GhError(ghExplain(r,'write the data file'));
     GH.sha=r.data&&r.data.content?r.data.content.sha:null; GH.last=Date.now(); GH.pending=false;
-    try{ localStorage.removeItem(OUTBOX_KEY); localStorage.removeItem(LEGACY_KEY); }catch(e){}
+    clearLocalCopies();
     setSync('ok',''); afterSync(); return true;
   }catch(e){
-    if(e.network){ GH.pending=true; try{ localStorage.setItem(OUTBOX_KEY,JSON.stringify(T)); }catch(_){} setSync('offline',e.message); }
-    else setSync('error',e.message||String(e));
+    /* keep what this device has until a save goes through, whatever the reason it failed */
+    GH.pending=true; try{ localStorage.setItem(OUTBOX_KEY,JSON.stringify(snapshot())); }catch(_){}
+    setSync(e.network?'offline':'error',e.message||String(e));
     return false;
   }
 }
 function ghPush(msg){ GH.chain=GH.chain.then(()=>ghPushNow(msg)).catch(()=>false); return GH.chain; }
-async function ghRefresh(){ /* pull-only: pick up sessions made on another device */
+async function ghRefresh(){ /* pick up changes from other devices; upload anything this device has that GitHub lacks */
   if(!GH.cfg||GH.state==='syncing') return;
   GH.chain=GH.chain.then(async()=>{
-    try{ setSync('syncing'); const {remote,sha}=await ghPull(); if(remote){ const before=totalSessions(); T=mergeT(T,remote); if(totalSessions()!==before) afterSync(); } GH.sha=sha; GH.last=Date.now(); setSync(GH.pending?'offline':'ok',''); }
-    catch(e){ setSync(e.network?'offline':'error',e.message); }
+    try{
+      setSync('syncing');
+      const {remote,sha}=await ghPull();
+      const before=canon(stateNow());
+      if(remote) setState(mergeState(stateNow(),remote));
+      GH.sha=sha; GH.last=Date.now();
+      if(canon(stateNow())!==before) afterSync();
+      const ahead=remote?canon(stateNow())!==canon(remote):totalSessions()>0;
+      if(!ahead){ GH.pending=false; clearLocalCopies(); }
+      setSync('ok','');
+      if(ahead) ghPush('Pace: sync scores from this device');
+    }catch(e){ setSync(e.network?'offline':'error',e.message); }
   }).catch(()=>{});
   return GH.chain;
 }
-function afterSync(){ if(document.body.dataset.view==='train') renderHub(); if(document.body.dataset.view==='progress') renderProgress(); }
-function record(k,entry,msg){
-  T[k].push(entry);
-  if(GH.cfg) ghPush('Pace: '+msg);
-  else { renderSync(); }
-}
+function afterSync(){ if(document.body.dataset.view==='train') renderHub(); if(document.body.dataset.view==='progress') renderProgress(); updateResetCounts(); }
+let lastRec=null;
+function commit(msg){ if(GH.cfg) ghPush('Pace: '+msg); else renderSync(); }
+function record(k,entry,msg){ T[k].push(entry); lastRec={k,d:entry.d}; commit(msg); }
 function unsavedNote(){ return GH.cfg?'':'<span class="unsaved">Not saved yet: this score lives only in this tab. <button type="button" onclick="openSheet(\'ghSheet\')">Connect GitHub</button> to keep it.</span>'; }
 
 /* legacy v5.1 data saved in this browser, and the offline outbox */
 let legacyCount=0;
 function loadLocalLeftovers(){
-  try{ const v=JSON.parse(localStorage.getItem(LEGACY_KEY)||'null'); if(v&&typeof v==='object'){ const m=mergeT(v,{}); legacyCount=totalSessions(m); T=mergeT(T,m); } }catch(e){}
-  try{ const v=JSON.parse(localStorage.getItem(OUTBOX_KEY)||'null'); if(v&&typeof v==='object'){ T=mergeT(T,v); GH.pending=true; } }catch(e){}
+  try{ const v=JSON.parse(localStorage.getItem(LEGACY_KEY)||'null'); if(v&&typeof v==='object'){ const m=normState(v); legacyCount=totalSessions(m.training); setState(mergeState(stateNow(),{training:m.training})); } }catch(e){}
+  try{ const v=JSON.parse(localStorage.getItem(OUTBOX_KEY)||'null'); if(v&&typeof v==='object'){ setState(mergeState(stateNow(),v)); GH.pending=true; } }catch(e){}
 }
 
 /* sync chip, home line, progress card */
@@ -1435,7 +1646,14 @@ function nextBtn(){
   return `<button class="btn sm pri next" type="button" onclick="showScreen('ex-${k}')">Next: ${NAMES[k]}</button>`;
 }
 function resultHTML(metric,unit,detail,pb,bestTxt){
-  return `<span class="metric num">${metric}<small>${unit}</small></span><span>${detail}</span><span class="pb">${pb?pb:bestTxt}</span>${nextBtn()}${unsavedNote()}`;
+  const disc=lastRec?`<button class="disc" type="button" onclick="discardResult(this,'${lastRec.k}',${lastRec.d})">Discard</button>`:'';
+  return `<span class="metric num">${metric}<small>${unit}</small></span><span>${detail}</span><span class="pb">${pb?pb:bestTxt}</span>${nextBtn()}${disc}${unsavedNote()}`;
+}
+function discardResult(btn,k,d){
+  const strip=btn.closest('.result');
+  const ok=deleteSession(k,d,()=>{ if(strip) strip.innerHTML='<span>Result restored. It counts again.</span>'+nextBtn(); });
+  if(!ok){ toast('That result was already removed'); return; }
+  if(strip) strip.innerHTML='<span>Result discarded. It no longer counts toward your stats.</span>'+nextBtn();
 }
 
 /* ================= drill: Schulte ================= */
@@ -1983,14 +2201,16 @@ function chartSVG(k){
   let rows=T[k];
   if(k==='schulte'&&rows.length){ const n=rows[rows.length-1].n; rows=rows.filter(x=>x.n===n); }
   rows=rows.slice(-30);
-  const vals=rows.map(x=>k==='rsvp'||k==='test'?x.wpm:k==='flash'?x.ms:k==='periph'?x.span:k==='stroop'?x.avg:x.t);
+  const valOf=x=>k==='rsvp'||k==='test'?x.wpm:k==='flash'?x.ms:k==='periph'?x.span:k==='stroop'?x.avg:x.t;
+  const vals=rows.map(valOf);
   const bestVal=def.better==='high'?Math.max(...vals):Math.min(...vals);
   const head=`<div class="t">${def.label}<span>${k==='schulte'&&rows.length?rows[0].n+'×'+rows[0].n+', seconds':def.sub}</span>${vals.length?`<span class="b">best ${def.fmt(bestVal)}</span>`:''}</div>`;
-  if(vals.length<2) return `<div class="chart">${head}<div class="empty">${vals.length?'One session so far. A trend needs two.':'No sessions yet'}</div></div>`;
-  if(tableMode){
-    return `<div class="chart">${head}<div class="tblwrap2"><table class="tbl"><thead><tr><th>Date</th><th class="n">${def.unit}</th><th class="n">Detail</th></tr></thead><tbody>${
-      rows.map((r,i)=>`<tr><td>${new Date(r.d).toLocaleDateString(undefined,{year:'2-digit',month:'short',day:'numeric'})}</td><td class="n">${def.fmt(vals[i])}</td><td class="n">${detailOf(k,r)}</td></tr>`).reverse().join('')}</tbody></table></div></div>`;
+  if(tableMode&&T[k].length){
+    const all=T[k].slice(-30).reverse();
+    return `<div class="chart">${head}<div class="tblwrap2"><table class="tbl"><thead><tr><th>Date</th><th class="n">${def.unit}</th><th class="n">Detail</th><th class="x"><span class="sr">Delete</span></th></tr></thead><tbody>${
+      all.map(r=>`<tr><td>${new Date(r.d).getFullYear()===new Date().getFullYear()?fmtStamp(r.d):new Date(r.d).toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric'})}</td><td class="n">${def.fmt(valOf(r))}</td><td class="n">${detailOf(k,r)}</td><td class="x"><button class="rowdel" type="button" data-k="${k}" data-d="${r.d}" title="Delete this session" aria-label="Delete the session from ${esc(fmtStamp(r.d))}"><svg class="i"><use href="#i-x"/></svg></button></td></tr>`).join('')}</tbody></table></div></div>`;
   }
+  if(vals.length<2) return `<div class="chart">${head}<div class="empty">${vals.length?'One session so far. A trend needs two.':'No sessions yet'}</div></div>`;
   const W=320,H=130,pl=34,pr=12,pt=14,pb=20;
   const {lo,hi,ticks}=niceTicks(Math.min(...vals),Math.max(...vals));
   const X=i=>pl+(vals.length===1?0:(i/(vals.length-1))*(W-pl-pr)), Y=v=>pt+(1-(v-lo)/((hi-lo)||1))*(H-pt-pb);
@@ -2007,7 +2227,7 @@ function chartSVG(k){
   return `<div class="chart" data-k="${k}">${head}<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${def.label} trend"><g class="grid">${grid}</g><path class="ar" d="${area}"/><path class="ln" d="${path}"/><line class="cross" y1="${pt}" y2="${H-pb}"/>${dots}${labBest}${labLast}${xl}</svg><div class="tip"></div></div>`;
 }
 function detailOf(k,r){
-  switch(k){ case 'schulte': case 'saccade': case 'hunt': return r.e+' err'; case 'rsvp': return r.w+' words'; case 'flash': case 'periph': return r.c+'/'+r.t; case 'test': return r.comp+'/'+(r.qn||3); case 'stroop': return r.e+' err'; } return '';
+  switch(k){ case 'schulte': return (r.n?r.n+'×'+r.n+', ':'')+r.e+' err'; case 'saccade': case 'hunt': return r.e+' err'; case 'rsvp': return r.w+' words'; case 'flash': case 'periph': return r.c+'/'+r.t; case 'test': return r.comp+'/'+(r.qn||3); case 'stroop': return r.e+' err'; } return '';
 }
 function wireChartHover(){
   $$('.chart[data-k]').forEach(c=>{
@@ -2066,14 +2286,124 @@ el('exportData').addEventListener('click',()=>{
   a.download='pace-data-'+new Date().toISOString().slice(0,10)+'.json'; a.click();
   setTimeout(()=>URL.revokeObjectURL(a.href),4000);
 });
-el('clearData').addEventListener('click',()=>{
-  if(!confirm(GH.cfg?'Delete all training history? The file in GitHub is overwritten with an empty history (the old version stays in the repository\'s commit log).':'Delete all training history in this tab?')) return;
-  T=emptyT(); try{ localStorage.removeItem(LEGACY_KEY); localStorage.removeItem(OUTBOX_KEY); }catch(e){} legacyCount=0;
-  if(GH.cfg) ghPushNow('Pace: reset history').then(()=>renderProgress()); else renderProgress();
+/* ================= reset, delete, undo ================= */
+function trimLegacy(){ /* keep v5.1 leftovers in this browser consistent with what was removed */
+  try{ const raw=localStorage.getItem(LEGACY_KEY); if(!raw) return;
+    const st=mergeState({...stateNow(),training:normState(JSON.parse(raw)).training},null);
+    legacyCount=totalSessions(st.training);
+    if(legacyCount) localStorage.setItem(LEGACY_KEY,JSON.stringify(st.training)); else localStorage.removeItem(LEGACY_KEY);
+  }catch(e){}
+}
+function resetDrills(keys){
+  const before=snapshot(); let n=0;
+  for(const k of keys){ n+=T[k].length; M.resets[k][Math.max(Date.now(),...T[k].map(x=>x.d))]=0; }
+  setState(snapshot()); trimLegacy();
+  const after=snapshot();
+  const what=keys.length===DRILLS.length?'all drills':keys.map(k=>NAMES[k]).join(', ');
+  commit(`reset ${what} (${n} session${n===1?'':'s'})`);
+  afterSync();
+  toast(`${n} session${n===1?'':'s'} cleared`,{action:'Undo',onAction:()=>undoChange(before,after,'reset of '+what)});
+}
+function deleteSession(k,d,onUndo){
+  if(!T[k]||!T[k].some(x=>x.d===d)) return false;
+  const before=snapshot();
+  M.deleted[k][d]=Math.max(Date.now(),(M.restored[k][d]||0)+1);
+  setState(snapshot()); trimLegacy();
+  const after=snapshot();
+  commit(`delete ${NAMES[k]} session from ${fmtStamp(d)}`);
+  afterSync();
+  toast('Session deleted',{action:'Undo',onAction:()=>{ undoChange(before,after,'deletion'); if(onUndo) onUndo(); }});
+  return true;
+}
+/* bring back what one change removed: lift its resets and mark its sessions restored */
+function undoChange(before,after,label){
+  before=normState(before); after=normState(after);
+  const now=Date.now(), was=totalSessions();
+  for(const k of DRILLS){
+    for(const [c,u] of Object.entries(after.resets[k])) if(u===0&&before.resets[k][c]!==0) M.resets[k][c]=Math.max(now,M.resets[k][c]||0);
+    const kept=new Set(after.training[k].map(x=>x.d));
+    for(const s of before.training[k]){
+      if(kept.has(s.d)) continue;
+      M.restored[k][s.d]=Math.max(now,removedAt(stateNow(),k,s.d)+1);
+      if(!T[k].some(x=>x.d===s.d)) T[k].push(s);
+    }
+  }
+  setState(snapshot());
+  const back=totalSessions()-was;
+  commit(`undo ${label}: ${back} session${back===1?'':'s'} back`);
+  afterSync();
+  toast(back?`${back} session${back===1?'':'s'} back`:'Nothing to bring back: those sessions are already here');
+  return back;
+}
+
+/* reset sheet */
+function syncResetUI(){
+  const l=el('resetList'), all=el('rAll'); if(!all) return;
+  const boxes=[...l.querySelectorAll('input[data-k]')], on=boxes.filter(b=>b.checked);
+  all.checked=on.length===boxes.length; all.indeterminate=on.length>0&&on.length<boxes.length;
+  const n=on.reduce((s,b)=>s+T[b.dataset.k].length,0), go=el('resetGo');
+  go.disabled=!n; go.textContent=n?`Reset ${n} session${n===1?'':'s'}`:'Nothing to reset';
+}
+function updateResetCounts(){
+  const l=el('resetList'); if(!l||!el('rAll')) return;
+  l.querySelectorAll('input[data-k]').forEach(i=>{ i.parentElement.querySelector('.cnt').textContent=T[i.dataset.k].length; });
+  el('rAll').parentElement.querySelector('.cnt').textContent=totalSessions();
+  syncResetUI();
+}
+function openReset(){
+  el('resetList').innerHTML=`<label class="check all"><input type="checkbox" id="rAll" checked>All drills<span class="cnt">${totalSessions()}</span></label>`+
+    DRILLS.map(k=>`<label class="check"><input type="checkbox" data-k="${k}" checked>${NAMES[k]}<span class="cnt">${T[k].length}</span></label>`).join('');
+  el('resetNote').innerHTML=GH.cfg
+    ?`Each reset is saved as a new version of <b>${esc(GH.cfg.owner+'/'+GH.cfg.repo)}</b>. Earlier versions stay in the repository's history; that is what makes undo possible. To erase them for good, delete the repository on GitHub.`
+    :'Scores are only in this tab until you connect GitHub, so this clears them here.';
+  syncResetUI(); openSheet('resetSheet'); renderUndoList();
+}
+el('resetList').addEventListener('change',e=>{ if(e.target.id==='rAll') el('resetList').querySelectorAll('input[data-k]').forEach(i=>{ i.checked=e.target.checked; }); syncResetUI(); });
+el('resetGo').addEventListener('click',()=>{ const keys=[...el('resetList').querySelectorAll('input[data-k]:checked')].map(i=>i.dataset.k); if(!keys.length) return; closeSheets(); resetDrills(keys); });
+el('clearData').addEventListener('click',openReset);
+el('charts').addEventListener('click',e=>{ const b=e.target.closest('.rowdel'); if(b) deleteSession(b.dataset.k,+b.dataset.d); });
+
+/* undo an older reset or deletion straight from the repository's history */
+let undoItems=[];
+async function ghFileAt(ref){
+  const path=ghContentsPath()+`?ref=${encodeURIComponent(ref)}`;
+  const r=await ghApi('GET',path);
+  if(r.status===404) return null;
+  if(!r.ok) throw new GhError(ghExplain(r,'read an earlier version'));
+  let txt;
+  if(r.data&&r.data.content) txt=b64dec(r.data.content);
+  else { const raw=await ghApi('GET',path,null,'application/vnd.github.raw+json'); if(!raw.ok) throw new GhError('Could not download that version.'); txt=raw.text; }
+  try{ return mergeState(JSON.parse(txt),null); }catch(e){ return null; }
+}
+const commitTitle=c=>c.commit.message.split('\n')[0].replace(/^Pace: /,'');
+async function renderUndoList(){
+  const box=el('undoBlock'); undoItems=[];
+  if(!GH.cfg){ box.innerHTML=''; return; }
+  const head='<div class="group ub">Undo an earlier reset or deletion</div>';
+  box.innerHTML=head+'<p class="fine">Looking through recent saves…</p>';
+  try{
+    const q=`?path=${encodeURIComponent(GH.cfg.path)}&per_page=100${GH.cfg.branch?'&sha='+encodeURIComponent(GH.cfg.branch):''}`;
+    const r=await ghApi('GET',`/repos/${GH.cfg.owner}/${GH.cfg.repo}/commits${q}`);
+    if(!r.ok) throw new GhError(ghExplain(r,'read the save history'));
+    undoItems=(Array.isArray(r.data)?r.data:[]).filter(c=>c&&c.commit&&/^Pace: (reset|delete)\b/.test(c.commit.message||'')&&Array.isArray(c.parents)&&c.parents.length).slice(0,6);
+    if(!undoItems.length){ box.innerHTML=head+'<p class="fine">No resets or deletions in the last 100 saves.</p>'; return; }
+    box.innerHTML=head+'<div class="ulist">'+undoItems.map((c,i)=>{ const when=Date.parse((c.commit.committer||c.commit.author||{}).date), t=commitTitle(c);
+      return `<div class="urow"><span class="t"><b>${esc(t.charAt(0).toUpperCase()+t.slice(1))}</b><span class="fine">${isNaN(when)?'':esc(fmtStamp(when))}</span></span><button class="btn sm" type="button" data-undo="${i}">Undo</button></div>`; }).join('')+'</div>';
+  }catch(e){ box.innerHTML=head+`<p class="fine">${esc(e.message||String(e))}</p>`; }
+}
+el('undoBlock').addEventListener('click',async e=>{
+  const b=e.target.closest('[data-undo]'); if(!b||b.disabled) return;
+  const c=undoItems[+b.dataset.undo]; if(!c) return;
+  b.disabled=true; b.textContent='Undoing…';
+  try{
+    const [after,before]=await Promise.all([ghFileAt(c.sha),ghFileAt(c.parents[0].sha)]);
+    const n=undoChange(before,after,'"'+commitTitle(c)+'"');
+    b.textContent=n?'Undone':'Already back';
+  }catch(err){ b.disabled=false; b.textContent='Undo'; toast(err.message||'Could not read that version'); }
 });
 
 /* ================= boot ================= */
-store.load(); applySettings();
+buildPickers(); store.load(); applySettings();
 $$('.nav button,.tabs button[data-view]').forEach(b=>b.classList.toggle('on',b.dataset.view==='home'));
 el('rvWpm').value=rv.wpm; el('rvWpmVal').textContent=rv.wpm; paintFill(el('rvWpm'));
 scBuild();
