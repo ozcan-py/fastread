@@ -370,6 +370,16 @@
   .rowdel:hover{color:var(--bad);background:var(--hover)}
   .rowdel svg.i{width:1rem;height:1rem}
   .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  .keys{display:none;flex-wrap:wrap;gap:.45rem 1.2rem;margin:1.1rem 0 0;font-size:.78rem;color:var(--ink-3)}
+  .keys span{display:inline-flex;align-items:center;gap:.25rem}
+  .qblock.kq{outline:2px solid var(--marker);outline-offset:.4rem;border-radius:var(--r-s)}
+  @media (hover:hover) and (pointer:fine){
+    .keys{display:flex}
+    .fopt[data-key]::before{content:attr(data-key);display:inline-grid;place-items:center;min-width:1.4rem;height:1.4rem;margin-right:.7rem;padding:0 .25rem;border:1px solid var(--line-2);border-bottom-width:2px;border-radius:5px;font-size:.72rem;font-weight:700;color:var(--ink-3);background:var(--surface);vertical-align:.1em}
+    .stroop-opts button[data-key]::before{content:attr(data-key);display:inline-grid;place-items:center;min-width:1.25rem;height:1.25rem;margin-right:.45rem;border:1px solid rgba(255,255,255,.6);border-radius:4px;font-size:.7rem;vertical-align:.08em}
+    .row .g{position:relative}
+    .row .g[data-key]::after{content:attr(data-key);position:absolute;right:-.4rem;bottom:-.4rem;min-width:1.05rem;height:1.05rem;display:grid;place-items:center;font-size:.62rem;font-weight:700;color:var(--ink-2);background:var(--surface);border:1px solid var(--line-2);border-radius:4px}
+  }
 
   /* ================= training hub ================= */
   .circuit{border:1px solid var(--line-2);border-radius:var(--r-l);padding:1rem 1.1rem;background:var(--surface);display:flex;flex-direction:column;gap:.75rem;margin-bottom:1.5rem;position:relative;overflow:hidden}
@@ -615,7 +625,7 @@
       </div>
       <div class="home-foot">
         <p class="fine" id="homeSync"></p>
-        <p class="fine">Pace 6.3. Display settings stay on this device; scores live in your GitHub repository.</p>
+        <p class="fine">Pace 6.4. Display settings stay on this device; scores live in your GitHub repository.</p>
       </div>
     </div>
   </section>
@@ -634,7 +644,7 @@
         <div class="vhead"><h2>Train</h2><span class="sub" id="hubSub"></span></div>
         <div class="circuit" id="circuitCard">
           <h3>Today's circuit</h3>
-          <p>Five short drills, about seven minutes: span, speed, then a timed read. Finish them and the day counts toward your streak.</p>
+          <p>All eight drills, about ten minutes: eye warm-up and span first, then focus and speed, ending with a timed read. Each one you finish today is ticked off.</p>
           <div class="steps" id="circuitSteps"></div>
           <div class="row2">
             <button class="btn pri" id="circuitStart">Start circuit</button>
@@ -963,7 +973,7 @@ function toast(msg,opt={}){
   const t=el('toast'); t.textContent=msg; t.classList.toggle('act',!!opt.action);
   if(opt.action){ const b=document.createElement('button'); b.type='button'; b.className='tact'; b.textContent=opt.action;
     b.addEventListener('click',()=>{ t.classList.remove('show'); clearTimeout(toastT); opt.onAction(); }); t.appendChild(b); }
-  t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),opt.action?9000:2600);
+  t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),opt.action?9000:Math.max(2600,msg.length*45));
 }
 
 /* ================= device settings (this browser only) ================= */
@@ -1240,6 +1250,7 @@ function jumpTo(i){
 /* ================= navigation ================= */
 let lastAppView='home';
 function go(v){
+  dropFocus();
   const prev=document.body.dataset.view;
   if(prev==='reader'&&v!=='reader') pause();
   if(prev==='train'&&v!=='train') stopAllDrills();
@@ -1253,8 +1264,9 @@ function go(v){
 $$('.nav button,.tabs button[data-view]').forEach(b=>b.addEventListener('click',()=>{ go(b.dataset.view); if(b.dataset.view==='train') showScreen('hub'); }));
 el('brand').addEventListener('click',()=>go('home'));
 el('exitReader').addEventListener('click',()=>go('home'));
+function dropFocus(){ const a=document.activeElement; if(a&&a!==document.body&&a.blur) a.blur(); } /* focus must not stay on a control that is about to be hidden */
 function showScreen(id){
-  stopAllDrills();
+  dropFocus(); stopAllDrills();
   $$('.tscreen').forEach(s=>s.classList.remove('show'));
   el(id).classList.add('show');
   if(id==='hub') renderHub();
@@ -1268,7 +1280,13 @@ function openSheet(id){ el(id).classList.add('open'); document.body.style.overfl
 function closeSheets(){ $$('.sheet.open').forEach(s=>s.classList.remove('open')); document.body.style.overflow=''; }
 $$('.sheet').forEach(s=>{ s.addEventListener('click',e=>{ if(e.target===s) closeSheets(); }); });
 $$('[data-close]').forEach(b=>b.addEventListener('click',closeSheets));
-document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeSheets(); });
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Escape') return;
+  if(document.querySelector('.sheet.open')){ closeSheets(); return; }
+  if(e.target&&/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)){ e.target.blur(); return; }
+  if(document.body.dataset.view==='train'){ const sc0=document.querySelector('.tscreen.show'); if(sc0&&sc0.id!=='hub') showScreen('hub'); return; }
+  if(document.body.dataset.view==='reader') go('home');
+});
 el('settingsBtn').addEventListener('click',()=>openSheet('settings'));
 el('tabSettings').addEventListener('click',()=>openSheet('settings'));
 el('typeBtn').addEventListener('click',()=>openSheet('settings'));
@@ -1389,9 +1407,9 @@ A company keeps **two separate books** at the same time, and both are correct fo
 - You will repay that saving later: a **liability**, i.e. a DTL.`;
 el('loadSample').addEventListener('click',()=>{ input.value=SAMPLE; render(SAMPLE); });
 el('freshBtn').addEventListener('click',async()=>{
-  const b=el('freshBtn'); if(b.disabled) return; const keep=b.innerHTML; b.disabled=true; b.textContent='Fetching…';
+  const b=el('freshBtn'); if(b.disabled) return; const keep=b.innerHTML; b.disabled=true; b.textContent='Finding an article…';
   try{ const a=await fetchArticle(S.lang); const md='# '+a.title+'\n\n'+a.md; input.value=md; render(md); }
-  catch(e){ toast('Could not fetch an article. Check the connection and try again.'); }
+  catch(e){ toast(articleError(e)); }
   finally{ b.disabled=false; b.innerHTML=keep; }
 });
 
@@ -1441,7 +1459,7 @@ async function ghPull(){
 function serialize(){
   const st=snapshot(), meta={};
   for(const f of ['resets','deleted','restored']){ const o={}; DRILLS.forEach(k=>{ if(Object.keys(st[f][k]).length) o[k]=sortedMap(st[f][k]); }); if(Object.keys(o).length) meta[f]=o; }
-  return JSON.stringify({app:'Pace',version:'6.3',updated:new Date().toISOString(),sessions:totalSessions(st.training),training:st.training,...meta},null,1);
+  return JSON.stringify({app:'Pace',version:'6.4',updated:new Date().toISOString(),sessions:totalSessions(st.training),training:st.training,...meta},null,1);
 }
 function clearLocalCopies(){ try{ localStorage.removeItem(OUTBOX_KEY); localStorage.removeItem(LEGACY_KEY); }catch(e){} legacyCount=0; }
 function setSync(state,err){ GH.state=state; if(err!==undefined) GH.err=err; renderSync(); }
@@ -1580,7 +1598,7 @@ window.addEventListener('online',()=>{ if(GH.cfg&&GH.pending) ghPush('Pace: uplo
 document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible'&&GH.cfg&&Date.now()-GH.lastPull>60000){ GH.pending?ghPush('Pace: upload queued scores'):ghRefresh(); } });
 
 /* ================= hub, circuit, stats ================= */
-const CIRCUIT=['schulte','rsvp','flash','saccade','test'];
+const CIRCUIT=['schulte','saccade','periph','flash','hunt','stroop','rsvp','test'];
 const circuit={on:false};
 function doneToday(k){ const t=dayKey(Date.now()); return T[k].some(x=>dayKey(x.d)===t); }
 function sessionsToday(){ const t=dayKey(Date.now()); return DRILLS.reduce((n,k)=>n+T[k].filter(x=>dayKey(x.d)===t).length,0); }
@@ -1633,7 +1651,7 @@ function renderHub(){
   const done=CIRCUIT.filter(doneToday).length;
   el('circuitSteps').innerHTML=CIRCUIT.map(k=>`<span class="step${doneToday(k)?' done':''}"><i></i>${NAMES[k]}</span>`).join('');
   const btn=el('circuitStart');
-  if(done===CIRCUIT.length){ btn.textContent='Circuit complete'; btn.disabled=true; el('circuitNote').textContent=`All five done today. Streak: ${streak()} day${streak()===1?'':'s'}.`; }
+  if(done===CIRCUIT.length){ btn.textContent='Circuit complete'; btn.disabled=true; el('circuitNote').textContent=`All eight done today. Streak: ${streak()} day${streak()===1?'':'s'}.`; }
   else { btn.disabled=false; btn.textContent=done?`Continue (${done} of ${CIRCUIT.length} done)`:'Start circuit'; el('circuitNote').textContent=streak()?`Streak: ${streak()} day${streak()===1?'':'s'}.`:''; }
   el('hubFoot').innerHTML=hubFootText();
 }
@@ -1714,9 +1732,9 @@ async function rvStart(){
     let text='', pid='';
     if(rv.src==='own'){ text=el('rvText').value.trim(); if(!text){ el('rvText').focus(); toast('Paste some text first'); return; } pid='own'; el('rvNote').textContent=''; }
     else if(rv.src==='wiki'){
-      rv.busy=true; el('rvPlay').disabled=true; el('rvPlay').textContent='Fetching…';
+      rv.busy=true; el('rvPlay').disabled=true; el('rvPlay').textContent='Finding…';
       try{ const a=await fetchArticle(S.lang); text=a.text; pid='wiki'; el('rvNote').textContent='Wikipedia: '+a.title; }
-      catch(e){ toast('Could not fetch an article; using a built-in passage.'); }
+      catch(e){ toast(articleError(e)+' Using a built-in passage instead.'); }
       finally{ rv.busy=false; el('rvPlay').disabled=false; }
       if(!document.getElementById('ex-rsvp').classList.contains('show')){ el('rvPlay').textContent='Start'; return; }
     }
@@ -1882,23 +1900,66 @@ function clozeQuestions(text,lang=S.lang,n=3){
   return out;
 }
 
-/* ---- fresh text: a random Wikipedia article intro in the drill language ---- */
+/* ---- fresh text: a Wikipedia article intro in the drill language ----
+   Plain random articles are mostly stubs, so one batch of ten often had nothing long enough and
+   the button failed. Now: draw from the wiki's good and featured articles first (real intros,
+   better prose), fall back to random batches of twenty, lower the length floor only as a last
+   resort, give up on a request after a few seconds, skip titles already shown, and keep the
+   next article loading in the background. */
 function cleanPara(s){ return s.replace(/\([^()]*\)/g,'').replace(/\[[^\]]*\]/g,'').replace(/\s+([,.;:!?])/g,'$1').replace(/\s+/g,' ').trim(); }
 function trimToWords(text,max,min=150){ const out=[]; let n=0; for(const s of splitSentences(text)){ const w=countWords(s); if(n+w>max&&n>=min) break; out.push(s); n+=w; } return out.join(' '); }
-async function fetchArticle(lang=S.lang){
-  const host=(lang==='tr'?'tr':'en')+'.wikipedia.org';
-  const url=`https://${host}/w/api.php?action=query&format=json&formatversion=2&origin=*&generator=random&grnnamespace=0&grnlimit=10&prop=extracts&exintro=1&explaintext=1&exlimit=10`;
-  const r=await fetch(url,{cache:'no-store'}); if(!r.ok) throw new Error('Wikipedia answered '+r.status);
-  const j=await r.json(); const pages=(j.query&&j.query.pages)||[];
-  const bad=/may refer to|anlamlara gelebilir|is a list of|listesidir/i;
-  const cands=pages.map(p=>{ const paras=String(p.extract||'').split(/\n+/).map(cleanPara).filter(x=>countWords(x)>=12); const text=paras.join(' '); return {title:p.title,paras,text,words:countWords(text)}; })
-    .filter(c=>c.words>=150&&!bad.test(c.text)&&c.text.replace(/\D/g,'').length/c.text.length<0.06);
-  if(!cands.length) throw new Error('No suitable article in this batch');
-  cands.sort((a,b)=>b.words-a.words);
-  const best=cands[0], text=trimToWords(best.text,330);
-  const md=[]; let n=0; for(const p of best.paras){ const w=countWords(p); if(n+w>360&&n>=150) break; md.push(p); n+=w; }
-  return {title:best.title,text,md:md.join('\n\n'),words:countWords(text)};
+const WIKI={en:{host:'en.wikipedia.org',cats:['Good articles','Featured articles']},tr:{host:'tr.wikipedia.org',cats:['Kaliteli maddeler','Seçkin maddeler']}};
+let WIKI_TIMEOUT=8000;
+const seenTitles=new Set(), nextArticle={};
+class WikiNetError extends Error{}
+async function wikiPages(host,params){
+  const ctl=new AbortController(), timer=setTimeout(()=>ctl.abort(),WIKI_TIMEOUT);
+  try{
+    const url=`https://${host}/w/api.php?`+new URLSearchParams({action:'query',format:'json',formatversion:'2',origin:'*',prop:'extracts',exintro:'1',explaintext:'1',exlimit:'20',...params});
+    let r; try{ r=await fetch(url,{cache:'no-store',signal:ctl.signal}); }catch(e){ throw new WikiNetError(e.name==='AbortError'?'timeout':'network'); }
+    if(!r.ok) throw new Error('Wikipedia answered '+r.status);
+    let j; try{ j=await r.json(); }catch(e){ throw e.name==='AbortError'?new WikiNetError('timeout'):new Error('Unreadable answer'); }
+    if(j.error) throw new Error(j.error.info||j.error.code||'API error');
+    return (j.query&&j.query.pages)||[];
+  }finally{ clearTimeout(timer); }
 }
+function pickArticle(pages,minWords){
+  const bad=/may refer to|refers to:|anlamlara gelebilir|is a list of|listesidir/i;
+  const cands=pages.filter(p=>p&&p.title&&!seenTitles.has(p.title)).map(p=>{ const paras=String(p.extract||'').split(/\n+/).map(cleanPara).filter(x=>countWords(x)>=12); const text=paras.join(' '); return {title:p.title,paras,text,words:countWords(text)}; })
+    .filter(c=>c.words>=minWords&&!bad.test(c.text)&&c.text.replace(/\D/g,'').length/Math.max(1,c.text.length)<0.08);
+  if(!cands.length) return null;
+  const c=cands[Math.floor(Math.random()*cands.length)], floor=Math.min(150,minWords);
+  const text=trimToWords(c.text,330,floor);
+  const md=[]; let n=0; for(const p of c.paras){ const w=countWords(p); if(n+w>360&&n>=floor) break; md.push(p); n+=w; }
+  return {title:c.title,text,md:md.join('\n\n'),words:countWords(text)};
+}
+async function loadArticle(lang){
+  const W=WIKI[lang]||WIKI.en; let net=0, last=null;
+  for(let i=0;i<8;i++){
+    try{
+      const pages=i<2
+        ?await wikiPages(W.host,{generator:'search',gsrsearch:`incategory:"${W.cats[i]}"`,gsrnamespace:'0',gsrlimit:'20',gsrsort:'random'})
+        :await wikiPages(W.host,{generator:'random',grnnamespace:'0',grnlimit:'20'});
+      net=0;
+      const a=pickArticle(pages,i<5?150:100);
+      if(a){ seenTitles.add(a.title); return a; }
+    }catch(e){ last=e; if(e instanceof WikiNetError&&++net>=2) break; }
+  }
+  throw last instanceof WikiNetError?last:new Error('none');
+}
+function prefetchArticle(lang){
+  if(nextArticle[lang]) return;
+  const p=loadArticle(lang); nextArticle[lang]=p;
+  p.catch(()=>{ if(nextArticle[lang]===p) nextArticle[lang]=null; });
+}
+async function fetchArticle(lang=S.lang){
+  const pre=nextArticle[lang]; nextArticle[lang]=null;
+  let a=null; if(pre){ try{ a=await pre; }catch(e){} }
+  if(!a) a=await loadArticle(lang);
+  prefetchArticle(lang);
+  return a;
+}
+function articleError(e){ return e instanceof WikiNetError?'Wikipedia could not be reached. On a work network it may be blocked.':'Wikipedia did not return a long enough article. Try again.'; }
 
 /* ---- Word Hunt lookalikes generated from the target ---- */
 const SIM={en:{a:'eo',b:'dh',c:'eo',d:'bp',e:'ac',f:'t',g:'q',h:'bn',i:'l',l:'i',m:'n',n:'mu',o:'ac',p:'q',q:'pg',r:'n',s:'z',t:'f',u:'n',v:'w',w:'v',y:'g',z:'s'},
@@ -1941,8 +2002,8 @@ function flNextRound(){
     fl.t2=setTimeout(()=>{
       stage.innerHTML='<span class="masked">█ █ █</span>';
       let d1=flDistract(fl.group), d2; do{ d2=flDistract(fl.group); }while(d2===d1);
-      shuffle([fl.group,d1,d2]).forEach(o=>{
-        const b=document.createElement('button'); b.className='fopt'; b.type='button'; b.textContent=o;
+      shuffle([fl.group,d1,d2]).forEach((o,i)=>{
+        const b=document.createElement('button'); b.className='fopt'; b.type='button'; b.dataset.key=i+1; b.textContent=o;
         b.addEventListener('click',()=>flChoose(b,o)); el('flOpts').appendChild(b);
       });
     },fl.ms);
@@ -1974,7 +2035,7 @@ async function teStartFn(src){
   if(te.busy) return; te.busy=true;
   const btn=src==='wiki'?el('teStartWiki'):el('teStart'), keep=btn.innerHTML; btn.disabled=true;
   let p=null;
-  if(src==='wiki'){ btn.textContent='Fetching…'; try{ const a=await fetchArticle(S.lang); p={id:'wiki',title:a.title,text:a.text,qs:clozeQuestions(a.text,S.lang)}; }catch(e){ toast('Could not fetch an article; using a built-in passage.'); } }
+  if(src==='wiki'){ btn.textContent='Finding an article…'; try{ const a=await fetchArticle(S.lang); const qs=clozeQuestions(a.text,S.lang); if(!qs.length) throw new Error('none'); p={id:'wiki',title:a.title,text:a.text,qs}; }catch(e){ toast(articleError(e)+' Using a built-in passage instead.'); } }
   if(!p) p={...nextPassage('test')};
   p.words=countWords(p.text);
   btn.disabled=false; btn.innerHTML=keep; te.busy=false;
@@ -1987,14 +2048,14 @@ async function teStartFn(src){
 }
 function teDoneFn(){
   clearInterval(te.int); te.sec=(performance.now()-te.t0)/1000;
-  el('teRead').style.display='none'; te.sel=te.p.qs.map(()=>-1);
+  el('teRead').style.display='none'; te.sel=te.p.qs.map(()=>-1); te.kq=null;
   const q=el('teQuiz'); q.style.display='block'; q.innerHTML='';
   te.p.qs.forEach((item,qi)=>{
     const blk=document.createElement('div'); blk.className='qblock';
     const qt=document.createElement('div'); qt.className='q'; qt.textContent=(qi+1)+'. '+item.q; blk.appendChild(qt);
     const opts=document.createElement('div'); opts.className='fopts';
     item.opts.forEach((o,oi)=>{
-      const b=document.createElement('button'); b.className='fopt'; b.type='button'; b.textContent=o;
+      const b=document.createElement('button'); b.className='fopt'; b.type='button'; b.dataset.key=oi+1; b.textContent=o;
       b.addEventListener('click',()=>{ te.sel[qi]=oi; [...opts.children].forEach(x=>x.classList.remove('sel')); b.classList.add('sel'); const sub=el('teSubmit'); if(sub) sub.disabled=te.sel.includes(-1); });
       opts.appendChild(b);
     });
@@ -2041,8 +2102,8 @@ function ppNext(){
       const correct=pp.pair.join('   ');
       function dstr(){ const c=[...pp.pair]; const i=Math.random()<0.5?0:1; let w; do{ w=bank[2+Math.floor(Math.random()*30)]; }while(c.includes(w)); c[i]=w; return c.join('   '); }
       let d1=dstr(), d2; do{ d2=dstr(); }while(d2===d1);
-      shuffle([correct,d1,d2]).forEach(o=>{
-        const b=document.createElement('button'); b.className='fopt'; b.type='button'; b.textContent=o;
+      shuffle([correct,d1,d2]).forEach((o,i)=>{
+        const b=document.createElement('button'); b.className='fopt'; b.type='button'; b.dataset.key=i+1; b.textContent=o;
         b.addEventListener('click',()=>ppChoose(b,o,correct)); el('ppOpts').appendChild(b);
       });
     },380);
@@ -2143,7 +2204,7 @@ function huStop(){ hu.running=false; clearInterval(hu.int); }
 let str2={round:0,total:20,errors:0,t0:0,ink:null,running:false,cols:[]};
 function strBuildOpts(){
   const o=el('strOpts'); o.innerHTML='';
-  str2.cols.forEach(col=>{ const b=document.createElement('button'); b.type='button'; b.textContent=col.n; b.style.background=col.c; b.addEventListener('click',()=>strChoose(col)); o.appendChild(b); });
+  str2.cols.forEach((col,i)=>{ const b=document.createElement('button'); b.type='button'; b.dataset.key=i+1; b.textContent=col.n; b.style.background=col.c; b.addEventListener('click',()=>strChoose(col)); o.appendChild(b); });
 }
 function strStartFn(){
   str2.round=0; str2.errors=0; str2.running=true; str2.t0=performance.now();
@@ -2400,6 +2461,75 @@ el('undoBlock').addEventListener('click',async e=>{
     const n=undoChange(before,after,'"'+commitTitle(c)+'"');
     b.textContent=n?'Undone':'Already back';
   }catch(err){ b.disabled=false; b.textContent='Undo'; toast(err.message||'Could not read that version'); }
+});
+
+/* ================= keyboard ================= */
+/* A mouse click shouldn't leave focus on the button, or Enter/Space would press it again. */
+document.addEventListener('click',e=>{ if(e.detail>0&&e.target.closest){ const b=e.target.closest('button'); if(b) b.blur(); } },true);
+const KEY_HINTS={
+  'hub':[['1–8','open a drill'],['Enter','circuit: start, then next after each result']],
+  'ex-schulte':[['Enter','start'],['3 4 5','grid size'],['Esc','back']],
+  'ex-rsvp':[['Space','play or pause'],['← →','speed'],['R','reset'],['1 2 3','text source'],['Esc','back']],
+  'ex-flash':[['Enter','start'],['1 2 3','answer'],['Esc','back']],
+  'ex-test':[['Enter','start, done, submit'],['W','fresh article'],['1 2 3','answer'],['↑ ↓','question'],['Esc','back']],
+  'ex-periph':[['Enter','start'],['1 2 3','answer'],['Esc','back']],
+  'ex-saccade':[['Enter','start'],['Esc','back']],
+  'ex-hunt':[['Enter','start'],['Esc','back']],
+  'ex-stroop':[['Enter','start'],['1 2 3 4','ink color'],['Esc','back']]
+};
+Object.entries(KEY_HINTS).forEach(([id,spec])=>{
+  const host=id==='hub'?el('hub'):el(id).querySelector('.ex');
+  const p=document.createElement('p'); p.className='keys';
+  p.innerHTML=spec.map(([keys,what])=>`<span>${keys.split(' ').map(k=>`<kbd>${k}</kbd>`).join('')} ${what}</span>`).join('');
+  host.appendChild(p);
+});
+$$('#hub .row .g').forEach((g,i)=>{ g.dataset.key=i+1; });
+const pressBtn=b=>{ if(b&&!b.disabled&&b.offsetParent!==null){ b.click(); return true; } return false; };
+const press=id=>pressBtn(el(id));
+const shown=id=>el(id).style.display!=='none';
+const pick=(box,n)=>pressBtn(box&&box.querySelectorAll('button')[n-1]);
+function startOrNext(resultId,startId){ /* after a result: next drill in the circuit, otherwise go again */
+  if(shown(resultId)){ const nb=el(resultId).querySelector('button.next'); if(nb) return pressBtn(nb); }
+  return press(startId);
+}
+function markQ(){ const bl=$$('#teQuiz .qblock'); bl.forEach((b,i)=>b.classList.toggle('kq',i===te.kq)); if(bl[te.kq]) bl[te.kq].scrollIntoView({block:'nearest'}); }
+const DRILL_KEYS={
+  'hub':k=>{ if(k==='Enter') return press('circuitStart'); if(/^[1-8]$/.test(k)) return pressBtn($$('#hub .row')[+k-1]); return false; },
+  'ex-schulte':k=>{ if(sc.running) return false; if(k==='Enter') return startOrNext('scResult','scStart');
+    if(/^[345]$/.test(k)) return pressBtn(el('scSize').querySelector(`[data-n="${k}"]`)); return false; },
+  'ex-rsvp':k=>{
+    if(k===' ') return press('rvPlay');
+    if(k==='Enter') return rv.playing||!shown('rvResult')?press('rvPlay'):startOrNext('rvResult','rvPlay');
+    if(k==='ArrowLeft'||k==='ArrowRight'){ const r=el('rvWpm'); r.value=+r.value+(k==='ArrowRight'?25:-25); r.dispatchEvent(new Event('input')); return true; }
+    if(k==='r'||k==='R') return press('rvReset');
+    if(/^[123]$/.test(k)&&!rv.playing) return pick(el('rvSrc'),+k);
+    return false; },
+  'ex-flash':k=>{ if(k==='Enter') return startOrNext('flResult','flStart'); if(/^[123]$/.test(k)) return pick(el('flOpts'),+k); return false; },
+  'ex-periph':k=>{ if(k==='Enter') return startOrNext('ppResult','ppStart'); if(/^[123]$/.test(k)) return pick(el('ppOpts'),+k); return false; },
+  'ex-test':k=>{
+    if(shown('teIntro')){ if(k==='Enter') return press('teStart'); if(k==='w'||k==='W') return press('teStartWiki'); return false; }
+    if(shown('teRead')) return k==='Enter'&&press('teDone');
+    if(shown('teQuiz')){
+      const bl=$$('#teQuiz .qblock'); if(!bl.length) return k==='Enter'&&press('teSubmit');
+      if(te.kq==null){ const f=te.sel.indexOf(-1); te.kq=f<0?0:f; }
+      if(/^[123]$/.test(k)){ if(!pick(bl[te.kq].querySelector('.fopts'),+k)) return false; const f=te.sel.indexOf(-1); if(f>=0) te.kq=f; markQ(); return true; }
+      if(k==='ArrowDown'||k==='ArrowUp'){ te.kq=Math.max(0,Math.min(bl.length-1,te.kq+(k==='ArrowDown'?1:-1))); markQ(); return true; }
+      if(k==='Enter') return press('teSubmit');
+      return false; }
+    if(shown('teResult')&&k==='Enter'){ const nb=el('teResult').querySelector('button.next'); return nb?pressBtn(nb):press('teAgain'); }
+    return false; },
+  'ex-saccade':k=>k==='Enter'&&!sa.running&&startOrNext('saResult','saStart'),
+  'ex-hunt':k=>k==='Enter'&&!hu.running&&startOrNext('huResult','huStart'),
+  'ex-stroop':k=>{ if(k==='Enter') return !str2.running&&startOrNext('strResult','strStart'); if(/^[1-4]$/.test(k)&&str2.running) return pick(el('strOpts'),+k); return false; }
+};
+document.addEventListener('keydown',e=>{
+  if(e.ctrlKey||e.metaKey||e.altKey||document.body.dataset.view!=='train'||document.querySelector('.sheet.open')) return;
+  const t=e.target; if(t&&(t.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
+  const k=e.key;
+  if(e.repeat&&k!=='ArrowLeft'&&k!=='ArrowRight') return;
+  if((k==='Enter'||k===' ')&&t&&t.closest&&t.closest('button,a,summary')&&t.offsetParent!==null) return; /* a visible control focused with Tab keeps its own Enter/Space */
+  const scr=document.querySelector('.tscreen.show'), fn=scr&&DRILL_KEYS[scr.id];
+  if(fn&&fn(k)) e.preventDefault();
 });
 
 /* ================= boot ================= */
